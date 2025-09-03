@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>kawa-web 投稿サイト</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <h1>kawa-web</h1>
 
 <form action="/post" method="post">
-    <input type="text" name="username" placeholder="名前">
-    <textarea name="content" placeholder="今何してる？"></textarea>
+    <input type="text" name="username" placeholder="名前" required>
+    <textarea name="content" placeholder="今何してる？" required></textarea>
     <button type="submit">投稿</button>
 </form>
 
 <h2>投稿一覧</h2>
-<div th:each="post : ${posts}">
-    <p><strong th:text="${post.username}"></strong>: <span th:text="${post.content}"></span></p>
-    <p th:text="${post.createdAt}"></p>
+<div th:each="post : ${posts}" class="post">
+    <!-- 1行目：名前と時間 -->
+	<p class="post-header">
+	    <strong th:text="${post.username}"></strong>
+	    <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}"></span>
+	</p>
+
+    <!-- 2行目：空白 -->
+    <p>&nbsp;</p>
+    <!-- 3行目：内容 -->
+    <p th:text="${post.content}"></p>
     <hr>
 </div>
 </body>
