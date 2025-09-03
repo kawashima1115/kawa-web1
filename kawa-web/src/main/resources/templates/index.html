@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>kawa-web 投稿サイト</title>
+</head>
+<body>
+<h1>kawa-web</h1>
+
+<form action="/post" method="post">
+    <input type="text" name="username" placeholder="名前">
+    <textarea name="content" placeholder="今何してる？"></textarea>
+    <button type="submit">投稿</button>
+</form>
+
+<h2>投稿一覧</h2>
+<div th:each="post : ${posts}">
+    <p><strong th:text="${post.username}"></strong>: <span th:text="${post.content}"></span></p>
+    <p th:text="${post.createdAt}"></p>
+    <hr>
+</div>
+</body>
+</html>
