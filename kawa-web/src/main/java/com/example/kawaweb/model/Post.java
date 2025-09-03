@@ -23,7 +23,7 @@ public class Post {
         createdAt = LocalDateTime.now();
     }
 
-    // getter / setter aaaaaa
+    // getter / setter aaaaaaa
     
     public Long getId() { return id; }
     public String getContent() { return content; }
