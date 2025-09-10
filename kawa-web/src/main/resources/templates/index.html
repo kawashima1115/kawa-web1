@@ -16,7 +16,7 @@
 
 <h2>投稿一覧</h2>
 <div th:each="post : ${posts}" class="post">
-    <!-- 1行目：名前と時間 -->
+    <!-- 1行目：名前と時間  -->
 	<p class="post-header">
 	    <strong th:text="${post.username}"></strong>
 	    <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}"></span>
