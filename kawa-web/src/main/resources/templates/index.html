@@ -5,147 +5,343 @@
 <title>kawa-web 投稿サイト</title>
 <link rel="stylesheet" th:href="@{/css/style.css}">
 <style>
-    /* 追加スタイル */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background: white;
+        min-height: calc(100vh - 40px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
     .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding: 10px 0;
-        border-bottom: 1px solid #ddd;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        border-bottom: 2px solid #e1e5e9;
+        position: relative;
     }
+    
+    .header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+        color: #2e7d32;
+        letter-spacing: -0.5px;
+    }
+    
     .user-info {
         font-size: 14px;
-        color: #666;
+        color: #6c757d;
+        font-weight: 500;
     }
+    
     .user-info a {
-        color: #007bff;
+        color: #2e7d32;
         text-decoration: none;
-        margin-left: 10px;
+        margin-left: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: rgba(46, 125, 50, 0.1);
     }
+    
     .user-info a:hover {
-        text-decoration: underline;
+        background: rgba(46, 125, 50, 0.15);
+        transform: translateY(-1px);
     }
+    
+    .user-info button {
+        background: none;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        margin-left: 12px;
+    }
+    
+    .user-info button:hover {
+        background: rgba(220, 53, 69, 0.1);
+        transform: translateY(-1px);
+    }
+    
     .login-prompt {
-        background-color: #f8f9fa;
-        padding: 20px;
+        background: rgba(46, 125, 50, 0.05);
+        padding: 30px;
         border-radius: 8px;
         text-align: center;
-        margin: 20px 0;
+        margin: 30px 0;
+        border: 1px solid rgba(46, 125, 50, 0.15);
     }
+    
+    .login-prompt h3 {
+        margin-top: 0;
+        color: #495057;
+        font-weight: 600;
+    }
+    
     .login-prompt a {
-        color: #007bff;
+        color: #2e7d32;
         text-decoration: none;
-        margin: 0 10px;
+        margin: 0 15px;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 6px;
+        background: rgba(46, 125, 50, 0.1);
+        transition: all 0.3s ease;
+        display: inline-block;
     }
+    
+    .login-prompt a:hover {
+        background: rgba(46, 125, 50, 0.15);
+        transform: translateY(-2px);
+    }
+    
     .alert {
-        padding: 10px;
-        margin-bottom: 20px;
-        border-radius: 4px;
+        padding: 16px 20px;
+        margin-bottom: 25px;
+        border-radius: 6px;
+        font-weight: 500;
+        border: none;
     }
+    
     .alert-error {
-        background-color: #f8d7da;
+        background: rgba(220, 53, 69, 0.1);
         color: #721c24;
-        border: 1px solid #f5c6cb;
+        border-left: 4px solid #dc3545;
     }
+    
     .alert-success {
-        background-color: #d4edda;
+        background: rgba(40, 167, 69, 0.1);
         color: #155724;
-        border: 1px solid #c3e6cb;
+        border-left: 4px solid #28a745;
     }
+    
     .post-form {
-        background-color: #f8f9fa;
-        padding: 20px;
+        background: rgba(46, 125, 50, 0.05);
+        padding: 25px;
         border-radius: 8px;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
+        border: 1px solid rgba(46, 125, 50, 0.15);
     }
+    
+    .post-form h3 {
+        margin-top: 0;
+        color: #495057;
+        font-weight: 600;
+        font-size: 18px;
+    }
+    
     .post-form textarea {
         width: 100%;
-        min-height: 80px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        min-height: 100px;
+        padding: 15px;
+        border: 2px solid #e1e5e9;
+        border-radius: 6px;
         resize: vertical;
         box-sizing: border-box;
+        font-family: inherit;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
     }
+    
+    .post-form textarea:focus {
+        outline: none;
+        border-color: #2e7d32;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+    }
+    
     .post-form button {
-        margin-top: 10px;
-        padding: 10px 20px;
-        background-color: #007bff;
+        margin-top: 15px;
+        padding: 12px 24px;
+        background: #2e7d32;
         color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 6px;
         cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
     }
+    
     .post-form button:hover {
-        background-color: #0056b3;
+        background: #1b5e20;
+        transform: translateY(-1px);
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 30px 0 20px 0;
+        color: #495057;
+        text-align: center;
+        position: relative;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: #2e7d32;
+        border-radius: 2px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #6c757d;
+        background: rgba(46, 125, 50, 0.05);
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .empty-state p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+    
+    .post {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .post:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .post:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #2e7d32;
+    }
+    
+    .post-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 15px 0;
+        font-size: 14px;
+    }
+    
+    .post-header strong {
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .timestamp {
+        color: #6c757d;
+        font-size: 12px;
+        background: rgba(46, 125, 50, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    
+    .post-content {
+        color: #212529;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0;
+        word-wrap: break-word;
+    }
+    
+    hr {
+        display: none;
     }
 </style>
 </head>
 <body>
 
-<!-- ヘッダー部分（ログイン状態表示） -->
-<div class="header">
-    <h1>kawa-web</h1>
-    <div class="user-info">
-        <div th:if="${isLoggedIn}">
-            ようこそ、<strong th:text="${loggedInUser.username}">ユーザー</strong>さん
-            <form action="/logout" method="post" style="display: inline;">
-                <button type="submit" style="background: none; border: none; color: #007bff; cursor: pointer; text-decoration: underline;">ログアウト</button>
-            </form>
-        </div>
-        <div th:unless="${isLoggedIn}">
-            <a href="/login">ログイン</a>
-            <a href="/register">新規登録</a>
+<div class="container">
+    <!-- ヘッダー部分（ログイン状態表示） -->
+    <div class="header">
+        <h1>kawa-web</h1>
+        <div class="user-info">
+            <div th:if="${isLoggedIn}">
+                ようこそ、<strong th:text="${loggedInUser.username}">ユーザー</strong>さん
+                <form action="/logout" method="post" style="display: inline;">
+                    <button type="submit">ログアウト</button>
+                </form>
+            </div>
+            <div th:unless="${isLoggedIn}">
+                <a href="/login">ログイン</a>
+                <a href="/register">新規登録</a>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- メッセージ表示 -->
-<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
-<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <!-- メッセージ表示 -->
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-<!-- 投稿フォーム（ログイン時のみ表示） -->
-<div th:if="${isLoggedIn}" class="post-form">
-    <h3>投稿する</h3>
-    <form action="/post" method="post">
-        <textarea name="content" placeholder="今何してる？" required></textarea>
-        <br>
-        <button type="submit">投稿</button>
-    </form>
-</div>
+    <!-- 投稿フォーム（ログイン時のみ表示） -->
+    <div th:if="${isLoggedIn}" class="post-form">
+        <h3>投稿する</h3>
+        <form action="/post" method="post">
+            <textarea name="content" placeholder="今何してる？" required></textarea>
+            <br>
+            <button type="submit">投稿</button>
+        </form>
+    </div>
 
-<!-- ログインしていない場合の案内 -->
-<div th:unless="${isLoggedIn}" class="login-prompt">
-    <h3>投稿するにはログインが必要です</h3>
-    <p>
-        <a href="/login">ログイン</a> または 
-        <a href="/register">新規登録</a> してください
-    </p>
-</div>
+    <!-- ログインしていない場合の案内 -->
+    <div th:unless="${isLoggedIn}" class="login-prompt">
+        <h3>投稿するにはログインが必要です</h3>
+        <p>
+            <a href="/login">ログイン</a> または 
+            <a href="/register">新規登録</a> してください
+        </p>
+    </div>
 
-<h2>投稿一覧</h2>
+    <h2 class="section-title">投稿一覧</h2>
 
-<!-- 投稿がない場合の表示 -->
-<div th:if="${#lists.isEmpty(posts)}" style="text-align: center; padding: 40px; color: #666;">
-    <p>まだ投稿がありません</p>
-    <p th:if="${isLoggedIn}">最初の投稿をしてみませんか？</p>
-</div>
+    <!-- 投稿がない場合の表示 -->
+    <div th:if="${#lists.isEmpty(posts)}" class="empty-state">
+        <p>まだ投稿がありません</p>
+        <p th:if="${isLoggedIn}">最初の投稿をしてみませんか？</p>
+    </div>
 
-<!-- 投稿一覧表示 -->
-<div th:each="post : ${posts}" class="post">
-    <!-- 1行目：名前と時間 -->
-    <p class="post-header">
-        <strong th:text="${post.username}">ユーザー名</strong>
-        <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
-    </p>
-
-    <!-- 2行目：空白 -->
-    <p>&nbsp;</p>
-    
-    <!-- 3行目：内容 -->
-    <p th:text="${post.content}">投稿内容</p>
-    <hr>
+    <!-- 投稿一覧表示 -->
+    <div th:each="post : ${posts}" class="post">
+        <!-- ヘッダー：名前と時間 -->
+        <div class="post-header">
+            <strong th:text="${post.username}">ユーザー名</strong>
+            <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+        </div>
+        
+        <!-- 内容 -->
+        <p class="post-content" th:text="${post.content}">投稿内容</p>
+    </div>
 </div>
 
 </body>
