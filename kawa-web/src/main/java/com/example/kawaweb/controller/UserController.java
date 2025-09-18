@@ -32,7 +32,7 @@ public class UserController {
     @PostMapping("/register")
     public String registerUser(@RequestParam String username, 
                               @RequestParam String password,
-                              @RequestParam String email,
+                              @RequestParam(required = false) String email,
                               RedirectAttributes redirectAttributes) {
         
         // ユーザー名重複チェック
