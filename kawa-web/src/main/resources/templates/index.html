@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>kawa-web 投稿サイト</title>
-<link rel="stylesheet" th:href="@{/css/style.css}">
+<!--<link rel="stylesheet" th:href="@{/css/style.css}">-->
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,11 +14,11 @@
     }
     
     .container {
-        max-width: 600px;
+        max-width: 800px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 30px;
         background: white;
-        min-height: calc(100vh - 40px);
+        min-height: calc(100vh - 60px);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
@@ -63,19 +63,20 @@
     }
     
     .user-info button {
-        background: none;
+        background: rgba(220, 53, 69, 0.1);
         border: none;
         color: #dc3545;
         cursor: pointer;
         font-weight: 600;
         padding: 6px 12px;
-        border-radius: 20px;
+        border-radius: 6px;
         transition: all 0.3s ease;
         margin-left: 12px;
+        font-size: 14px;
     }
     
     .user-info button:hover {
-        background: rgba(220, 53, 69, 0.1);
+        background: rgba(220, 53, 69, 0.15);
         transform: translateY(-1px);
     }
     
@@ -137,6 +138,7 @@
         border-radius: 8px;
         margin-bottom: 40px;
         border: 1px solid rgba(46, 125, 50, 0.15);
+        text-align: right;
     }
     
     .post-form h3 {
@@ -158,6 +160,7 @@
         font-size: 14px;
         transition: all 0.3s ease;
         background: white;
+        text-align: left;
     }
     
     .post-form textarea:focus {
@@ -306,7 +309,7 @@
 
     <!-- 投稿フォーム（ログイン時のみ表示） -->
     <div th:if="${isLoggedIn}" class="post-form">
-        <h3>投稿する</h3>
+<!--        <h3>投稿する</h3>-->
         <form action="/post" method="post">
             <textarea name="content" placeholder="今何してる？" required></textarea>
             <br>
