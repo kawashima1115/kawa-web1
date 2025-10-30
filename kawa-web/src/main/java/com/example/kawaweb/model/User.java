@@ -14,42 +14,50 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "app_users")  // この行を追加
+@Table(name = "app_users")  // DBテーブル名を「app_users」に指定
 public class User {
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    // 主キー（自動採番）
     private Long id;
     
     @Column(unique = true, nullable = false)
+    // ユーザー名（重複不可、null不可）
     private String username;
     
     @Column(nullable = false)
+    // パスワード（必須）
     private String password;
     
+    // メールアドレス（必須ではない）
     private String email;
     
+    // 登録日時
     private LocalDateTime createdAt;
     
-    // ユーザーの投稿一覧（一対多）
+    // ユーザーが作成した投稿（Post エンティティ）との 1対多 関係
+    // mappedBy="user" → Post 側にある「user」フィールドが外部キーを持つ
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;
     
+    // データ保存前に自動で現在日時をセット
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
     
-    // デフォルトコンストラクタ
+    // デフォルトコンストラクタ（JPAが内部的に利用）
     public User() {}
     
-    // コンストラクタ
+    // 任意の初期値を入れるためのコンストラクタ
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
     }
     
-    // getter/setter
+    // getter/setter（プロパティアクセス用）
     public Long getId() {
         return id;
     }
@@ -100,6 +108,7 @@ public class User {
     
     @Override
     public String toString() {
+        // ログ出力やデバッグ用にユーザー情報を文字列化
         return "User{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
