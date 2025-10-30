@@ -1,6 +1,7 @@
 package com.example.kawaweb.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,10 +33,10 @@ public class PostController {
         model.addAttribute("loggedInUser", loggedInUser);
         model.addAttribute("isLoggedIn", UserController.isLoggedIn(session));
         
-        return "index"; // src/main/resources/templates/index.html
+        return "index";
     }
     
-    // 新しい投稿処理（ログインユーザー対応）
+    // 新しい投稿処理
     @PostMapping("/post")
     public String createPost(@RequestParam String content, 
                            HttpSession session,
@@ -56,14 +57,48 @@ public class PostController {
         return "redirect:/";
     }
     
+    // 投稿削除処理（自分の投稿のみ）
+    @PostMapping("/post/delete")
+    public String deletePost(@RequestParam Long postId,
+                           HttpSession session,
+                           RedirectAttributes redirectAttributes) {
+        
+        // ログイン確認
+        User loggedInUser = UserController.getLoggedInUser(session);
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        // 投稿を検索
+        Optional<Post> postOpt = postRepository.findById(postId);
+        
+        if (postOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "投稿が見つかりませんでした");
+            return "redirect:/";
+        }
+        
+        Post post = postOpt.get();
+        
+        // 投稿者本人かチェック
+        if (!post.getUser().getId().equals(loggedInUser.getId())) {
+            redirectAttributes.addFlashAttribute("error", "自分の投稿のみ削除できます");
+            return "redirect:/";
+        }
+        
+        // 削除実行
+        postRepository.delete(post);
+        redirectAttributes.addFlashAttribute("success", "投稿を削除しました");
+        
+        return "redirect:/";
+    }
+    
     // 旧バージョンとの互換性を保つためのメソッド（オプション）
     @PostMapping("/post-guest")
     public String createGuestPost(@RequestParam String username, 
                                 @RequestParam String content,
                                 RedirectAttributes redirectAttributes) {
         
-        // ゲスト投稿の場合、Userオブジェクトなしで投稿
-        // ※実際の運用では推奨しませんが、移行期間用
         redirectAttributes.addFlashAttribute("error", "ゲスト投稿は廃止されました。ログインして投稿してください");
         return "redirect:/login";
     }
