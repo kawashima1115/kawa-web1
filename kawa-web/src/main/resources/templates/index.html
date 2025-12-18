@@ -63,6 +63,15 @@
         transform: translateY(-1px);
     }
     
+    .user-info .mypage-link {
+        background: rgba(0, 123, 255, 0.1);
+        color: #007bff;
+    }
+    
+    .user-info .mypage-link:hover {
+        background: rgba(0, 123, 255, 0.15);
+    }
+    
     .user-info button {
         background: rgba(220, 53, 69, 0.1);
         border: none;
@@ -366,6 +375,7 @@
         <div class="user-info">
             <div th:if="${isLoggedIn}">
                 ようこそ、<strong th:text="${loggedInUser.username}">ユーザー</strong>さん
+                <a href="/mypage" class="mypage-link">マイページ</a>
                 <form action="/logout" method="post" style="display: inline;">
                     <button type="submit">ログアウト</button>
                 </form>
