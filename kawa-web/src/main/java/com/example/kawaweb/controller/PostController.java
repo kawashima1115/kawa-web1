@@ -31,6 +31,7 @@ public class PostController {
         // ログインユーザー情報をモデルに追加
         User loggedInUser = UserController.getLoggedInUser(session);
         model.addAttribute("loggedInUser", loggedInUser);
+        
         model.addAttribute("isLoggedIn", UserController.isLoggedIn(session));
         
         return "index";

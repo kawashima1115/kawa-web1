@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロフィール編集 - kawa-web</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.header h1 {
+    font-size: 28px;
+    color: #2e7d32;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #2e7d32;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.3s;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background: #1b5e20;
+}
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
+
+.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-error {
+    background: rgba(220, 53, 69, 0.1);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.alert-info {
+    background: rgba(13, 202, 240, 0.1);
+    color: #055160;
+    border-left: 4px solid #0dcaf0;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    color: #495057;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.form-group input:disabled {
+    background: #e9ecef;
+    cursor: not-allowed;
+}
+
+.form-help {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.form-actions button,
+.form-actions a {
+    flex: 1;
+    text-align: center;
+}
+
+.current-info {
+    background: rgba(46, 125, 50, 0.05);
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.current-info strong {
+    color: #2e7d32;
+}
+
+.warning-box {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #856404;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- ヘッダー -->
+    <div class="header">
+        <h1>プロフィール編集</h1>
+        <a href="/mypage" class="btn btn-secondary">戻る</a>
+    </div>
+
+    <!-- メッセージ表示 -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
+
+    <!-- 現在の情報表示 -->
+    <div class="current-info">
+        <p><strong>現在のユーザー名:</strong> <span th:text="${user.username}">username</span></p>
+        <p th:if="${user.email != null and !user.email.isEmpty()}">
+            <strong>現在のメールアドレス:</strong> <span th:text="${user.email}">email@example.com</span>
+        </p>
+        <p th:if="${user.email == null or user.email.isEmpty()}">
+            <strong>現在のメールアドレス:</strong> 未設定
+        </p>
+    </div>
+
+    <form action="/mypage/update" method="post">
+        <!-- 基本情報セクション -->
+        <div class="form-section">
+            <h2>基本情報</h2>
+            
+            <div class="form-group">
+                <label for="username">ユーザー名</label>
+                <input type="text" id="username" name="username" 
+                       th:value="${user.username}" disabled>
+                <div class="form-help">※ユーザー名は変更できません</div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">メールアドレス</label>
+                <input type="email" id="email" name="email" 
+                       th:value="${user.email}" 
+                       placeholder="email@example.com">
+                <div class="form-help">メールアドレスを変更または削除できます（空欄で削除）</div>
+            </div>
+        </div>
+
+        <!-- パスワード変更セクション -->
+        <div class="form-section">
+            <h2>パスワード変更</h2>
+            
+            <div class="warning-box">
+                パスワードを変更する場合のみ、以下の欄に入力してください。変更しない場合は空欄のままにしてください。
+            </div>
+
+            <div class="form-group">
+                <label for="currentPassword">現在のパスワード</label>
+                <input type="password" id="currentPassword" name="currentPassword" 
+                       placeholder="現在のパスワードを入力">
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">新しいパスワード</label>
+                <input type="password" id="newPassword" name="newPassword" 
+                       placeholder="新しいパスワード（8文字以上）">
+                <div class="form-help">8文字以上で設定してください</div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">新しいパスワード（確認）</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" 
+                       placeholder="もう一度入力してください">
+            </div>
+        </div>
+
+        <!-- 送信ボタン -->
+        <div class="form-actions">
+            <a href="/mypage" class="btn btn-secondary">キャンセル</a>
+            <button type="submit" class="btn">変更を保存</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// パスワード確認のバリデーション
+document.querySelector('form').addEventListener('submit', function(e) {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const currentPassword = document.getElementById('currentPassword').value;
+    
+    // パスワード変更を試みている場合
+    if (newPassword || confirmPassword || currentPassword) {
+        // 現在のパスワードが未入力
+        if (!currentPassword) {
+            e.preventDefault();
+            alert('現在のパスワードを入力してください');
+            return;
+        }
+        
+        // 新しいパスワードが未入力
+        if (!newPassword) {
+            e.preventDefault();
+            alert('新しいパスワードを入力してください');
+            return;
+        }
+        
+        // パスワードの長さチェック
+        if (newPassword.length < 8) {
+            e.preventDefault();
+            alert('新しいパスワードは8文字以上で設定してください');
+            return;
+        }
+        
+        // パスワード確認が一致しない
+        if (newPassword !== confirmPassword) {
+            e.preventDefault();
+            alert('新しいパスワードと確認用パスワードが一致しません');
+            return;
+        }
+    }
+});
+</script>
+</body>
+</html>

@@ -95,6 +95,12 @@ body {
     border-left: 4px solid #dc3545;
 }
 
+.alert-info {
+    background: rgba(13, 202, 240, 0.1);
+    color: #055160;
+    border-left: 4px solid #0dcaf0;
+}
+
 .profile-card {
     background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
     color: white;
@@ -231,6 +237,7 @@ body {
     <!-- メッセージ表示 -->
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
 
     <!-- プロフィールカード -->
     <div class="profile-card">
@@ -253,10 +260,10 @@ body {
     </div>
 
     <!-- アクションボタン -->
-<!--    <div class="actions">-->
-<!--        <a href="/mypage/edit" class="btn">プロフィール編集</a>-->
-<!--        <a href="/mypage/delete-confirm" class="btn btn-danger">アカウント削除</a>-->
-<!--    </div>-->
+    <div class="actions">
+        <a href="/mypage/edit" class="btn">プロフィール編集</a>
+        <a href="/mypage/delete-confirm" class="btn btn-danger">アカウント削除</a>
+    </div>
 
     <!-- 投稿一覧 -->
     <h2 class="section-title">あなたの投稿</h2>
@@ -276,6 +283,7 @@ body {
                 <form action="/post/delete" method="post" style="display: inline;" 
                       onsubmit="return confirm('本当に削除しますか?');">
                     <input type="hidden" name="postId" th:value="${post.id}">
+					
                     <button type="submit" class="delete-btn">削除</button>
                 </form>
             </div>
