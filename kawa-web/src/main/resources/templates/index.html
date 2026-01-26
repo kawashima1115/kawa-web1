@@ -158,7 +158,7 @@
     }
     
     /* Quillエディタのスタイル調整 */
-    #editor {
+    #editor, .reply-editor {
         min-height: 150px;
         background: white;
         border-radius: 0 0 6px 6px;
@@ -306,7 +306,7 @@
         color: #212529;
         font-size: 15px;
         line-height: 1.6;
-        margin: 0;
+        margin: 0 0 15px 0;
         word-wrap: break-word;
     }
     
@@ -339,17 +339,47 @@
         text-decoration: underline;
     }
     
-    /* 削除ボタンのスタイル */
+    /* 投稿アクション */
+    .post-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+    }
+    
+    .reply-btn {
+        background: rgba(46, 125, 50, 0.1);
+        border: none;
+        color: #2e7d32;
+        cursor: pointer;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        font-size: 13px;
+    }
+    
+    .reply-btn:hover {
+        background: rgba(46, 125, 50, 0.2);
+        transform: translateY(-1px);
+    }
+    
+    .reply-count {
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
     .delete-btn {
         background: rgba(220, 53, 69, 0.1);
         border: none;
         color: #dc3545;
         cursor: pointer;
         font-weight: 600;
-        padding: 5px 10px;
+        padding: 6px 12px;
         border-radius: 4px;
         transition: all 0.3s ease;
-        font-size: 12px;
+        font-size: 13px;
     }
     
     .delete-btn:hover {
@@ -357,8 +387,83 @@
         transform: translateY(-1px);
     }
     
-    .delete-btn:active {
-        transform: translateY(0);
+    /* 返信フォーム */
+    .reply-form {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 15px;
+        display: none;
+    }
+    
+    .reply-form.active {
+        display: block;
+    }
+    
+    .reply-editor {
+        min-height: 100px !important;
+    }
+    
+    .reply-editor .ql-editor {
+        min-height: 100px;
+    }
+    
+    .reply-form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .reply-form-actions button {
+        flex: 1;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background: #5a6268;
+    }
+    
+    .btn-submit {
+        background: #2e7d32;
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        background: #1b5e20;
+    }
+    
+    /* 返信一覧 */
+    .replies {
+        margin-top: 15px;
+        padding-left: 30px;
+        border-left: 3px solid #e9ecef;
+    }
+    
+    .reply-item {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .reply-item .post-header {
+        margin-bottom: 10px;
+    }
+    
+    .reply-item .post-content {
+        margin-bottom: 10px;
     }
     
     hr {
@@ -369,7 +474,7 @@
 <body>
 
 <div class="container">
-    <!-- ヘッダー部分（ログイン状態表示） -->
+    <!-- ヘッダー部分 -->
     <div class="header">
         <h1>kawa-web</h1>
         <div class="user-info">
@@ -391,12 +496,10 @@
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <!-- 投稿フォーム（ログイン時のみ表示） -->
+    <!-- 投稿フォーム（ログイン時のみ） -->
     <div th:if="${isLoggedIn}" class="post-form">
         <form id="postForm" action="/post" method="post">
-            <!-- Quillエディタ -->
             <div id="editor"></div>
-            <!-- 隠しフィールド：HTMLコンテンツを送信 -->
             <input type="hidden" name="content" id="hiddenContent" required>
             <button type="submit">投稿</button>
         </form>
@@ -413,40 +516,93 @@
 
     <h2 class="section-title">投稿一覧</h2>
 
-    <!-- 投稿がない場合の表示 -->
+    <!-- 投稿がない場合 -->
     <div th:if="${#lists.isEmpty(posts)}" class="empty-state">
         <p>まだ投稿がありません</p>
         <p th:if="${isLoggedIn}">最初の投稿をしてみませんか？</p>
     </div>
 
-    <!-- 投稿一覧表示 -->
+    <!-- 投稿一覧 -->
     <div th:each="post : ${posts}" class="post">
-        <!-- ヘッダー：名前と時間 -->
+        <!-- 投稿ヘッダー -->
         <div class="post-header">
             <div class="post-header-left">
                 <strong th:text="${post.username}">ユーザー名</strong>
                 <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
             </div>
+        </div>
+        
+        <!-- 投稿内容 -->
+        <div class="post-content" th:utext="${post.content}">投稿内容</div>
+        
+        <!-- アクション -->
+        <div class="post-actions">
+            <!-- 返信ボタン -->
+            <button th:if="${isLoggedIn}" 
+                    class="reply-btn" 
+                    th:onclick="'toggleReplyForm(' + ${post.id} + ')'">
+                💬 返信する
+            </button>
             
-            <!-- 削除ボタン（自分の投稿の場合のみ表示） -->
-            <div th:if="${isLoggedIn and loggedInUser.id == post.user.id}">
-                <form action="/post/delete" method="post" style="display: inline;" 
+            <!-- 返信数表示 -->
+            <span class="reply-count" th:if="${post.replyCount > 0}">
+                <span th:text="${post.replyCount}">0</span>件の返信
+            </span>
+            
+            <!-- 削除ボタン -->
+            <form th:if="${isLoggedIn and loggedInUser.id == post.user.id}" 
+                  action="/post/delete" method="post" 
+                  style="display: inline;"
+                  onsubmit="return confirm('本当に削除しますか？');">
+                <input type="hidden" name="postId" th:value="${post.id}">
+                <button type="submit" class="delete-btn">削除</button>
+            </form>
+        </div>
+        
+        <!-- 返信フォーム -->
+        <div th:if="${isLoggedIn}" class="reply-form" th:id="'reply-form-' + ${post.id}">
+            <form th:id="'replyForm-' + ${post.id}" action="/post/reply" method="post">
+                <input type="hidden" name="parentId" th:value="${post.id}">
+                <div th:id="'reply-editor-' + ${post.id}" class="reply-editor"></div>
+                <input type="hidden" th:id="'reply-content-' + ${post.id}" name="content" required>
+                <div class="reply-form-actions">
+                    <button type="button" class="btn-cancel" th:onclick="'toggleReplyForm(' + ${post.id} + ')'">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="btn-submit">返信を投稿</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 返信一覧 -->
+        <div th:if="${!post.replies.isEmpty()}" class="replies">
+            <div th:each="reply : ${post.replies}" class="reply-item">
+                <div class="post-header">
+                    <div class="post-header-left">
+                        <strong th:text="${reply.username}">ユーザー名</strong>
+                        <span class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                    </div>
+                </div>
+                
+                <div class="post-content" th:utext="${reply.content}">返信内容</div>
+                
+                <!-- 返信の削除ボタン -->
+                <form th:if="${isLoggedIn and loggedInUser.id == reply.user.id}" 
+                      action="/post/delete" method="post" 
+                      style="display: inline;"
                       onsubmit="return confirm('本当に削除しますか？');">
-                    <input type="hidden" name="postId" th:value="${post.id}">
+                    <input type="hidden" name="postId" th:value="${reply.id}">
                     <button type="submit" class="delete-btn">削除</button>
                 </form>
             </div>
         </div>
-        
-        <!-- 内容（HTMLとして表示） -->
-        <div class="post-content" th:utext="${post.content}">投稿内容</div>
     </div>
 </div>
 
 <!-- Quill.js JavaScript -->
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-// Quillエディタの初期化（ログインしている場合のみ）
+// メイン投稿用Quillエディタの初期化
 if (document.getElementById('editor')) {
     var quill = new Quill('#editor', {
         theme: 'snow',
@@ -464,10 +620,9 @@ if (document.getElementById('editor')) {
         }
     });
 
-    // フォーム送信時にQuillの内容を隠しフィールドにセット
+    // フォーム送信時の処理
     document.getElementById('postForm').onsubmit = function() {
         var content = quill.root.innerHTML;
-        // 空の<p><br></p>だけの場合は空と判定
         if (content === '<p><br></p>' || quill.getText().trim().length === 0) {
             alert('投稿内容を入力してください');
             return false;
@@ -475,6 +630,55 @@ if (document.getElementById('editor')) {
         document.getElementById('hiddenContent').value = content;
         return true;
     };
+}
+
+// 返信エディタの管理
+var replyEditors = {};
+
+function toggleReplyForm(postId) {
+    const form = document.getElementById('reply-form-' + postId);
+    const isActive = form.classList.contains('active');
+    
+    if (isActive) {
+        // 閉じる
+        form.classList.remove('active');
+        if (replyEditors[postId]) {
+            replyEditors[postId].setText('');
+        }
+    } else {
+        // 開く
+        form.classList.add('active');
+        
+        // エディタがまだ初期化されていない場合は初期化
+        if (!replyEditors[postId]) {
+            replyEditors[postId] = new Quill('#reply-editor-' + postId, {
+                theme: 'snow',
+                placeholder: '返信を入力...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+            
+            // フォーム送信時の処理
+            document.getElementById('replyForm-' + postId).onsubmit = function() {
+                var content = replyEditors[postId].root.innerHTML;
+                if (content === '<p><br></p>' || replyEditors[postId].getText().trim().length === 0) {
+                    alert('返信内容を入力してください');
+                    return false;
+                }
+                document.getElementById('reply-content-' + postId).value = content;
+                return true;
+            };
+        }
+        
+        // フォーカス
+        replyEditors[postId].focus();
+    }
 }
 </script>
 

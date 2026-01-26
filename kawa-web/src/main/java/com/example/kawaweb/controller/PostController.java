@@ -25,13 +25,13 @@ public class PostController {
     
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        // 親投稿のみを取得（返信は除外）
+        List<Post> posts = postRepository.findByParentIsNullOrderByCreatedAtDesc();
         model.addAttribute("posts", posts);
         
         // ログインユーザー情報をモデルに追加
         User loggedInUser = UserController.getLoggedInUser(session);
         model.addAttribute("loggedInUser", loggedInUser);
-        
         model.addAttribute("isLoggedIn", UserController.isLoggedIn(session));
         
         return "index";
@@ -55,6 +55,37 @@ public class PostController {
         postRepository.save(post);
         
         redirectAttributes.addFlashAttribute("success", "投稿しました");
+        return "redirect:/";
+    }
+    
+    // 返信処理
+    @PostMapping("/post/reply")
+    public String replyToPost(@RequestParam Long parentId,
+                            @RequestParam String content,
+                            HttpSession session,
+                            RedirectAttributes redirectAttributes) {
+        
+        // ログイン確認
+        User loggedInUser = UserController.getLoggedInUser(session);
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "返信するにはログインが必要です");
+            return "redirect:/login";
+        }
+        
+        // 親投稿を検索
+        Optional<Post> parentOpt = postRepository.findById(parentId);
+        if (parentOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "返信先の投稿が見つかりませんでした");
+            return "redirect:/";
+        }
+        
+        Post parent = parentOpt.get();
+        
+        // 返信作成・保存
+        Post reply = new Post(content, loggedInUser, parent);
+        postRepository.save(reply);
+        
+        redirectAttributes.addFlashAttribute("success", "返信しました");
         return "redirect:/";
     }
     
@@ -87,7 +118,7 @@ public class PostController {
             return "redirect:/";
         }
         
-        // 削除実行
+        // 削除実行（返信も一緒に削除される）
         postRepository.delete(post);
         redirectAttributes.addFlashAttribute("success", "投稿を削除しました");
         
