@@ -3,6 +3,7 @@ package com.example.kawaweb.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -55,11 +56,36 @@ public class MyPageController {
         
         User user = userOpt.get();
         
-        // ユーザーの投稿を取得
-        List<Post> userPosts = new ArrayList<>();
+        // ユーザーの全投稿を取得
+        List<Post> allPosts = new ArrayList<>();
+        List<Post> userPosts = new ArrayList<>();  // 親投稿のみ
+        List<Post> userReplies = new ArrayList<>(); // 返信のみ
+        
         try {
-            userPosts = postRepository.findByUserOrderByCreatedAtDesc(user);
-            System.out.println("投稿数: " + userPosts.size());
+            allPosts = postRepository.findByUserOrderByCreatedAtDesc(user);
+            
+            System.out.println("=== 投稿データ詳細 ===");
+            System.out.println("総投稿数: " + allPosts.size());
+            
+            // 各投稿の詳細をログ出力
+            for (Post post : allPosts) {
+                System.out.println("投稿ID: " + post.getId() + 
+                                 ", parent: " + (post.getParent() != null ? post.getParent().getId() : "null") +
+                                 ", isReply: " + (post.getParent() != null));
+            }
+            
+            // 投稿と返信を分離
+            userPosts = allPosts.stream()
+                    .filter(post -> post.getParent() == null)  // 親投稿のみ
+                    .collect(Collectors.toList());
+            
+            userReplies = allPosts.stream()
+                    .filter(post -> post.getParent() != null)   // 返信のみ
+                    .collect(Collectors.toList());
+            
+            System.out.println("親投稿数: " + userPosts.size());
+            System.out.println("返信数: " + userReplies.size());
+            System.out.println("===================");
         } catch (Exception e) {
             System.out.println("投稿取得エラー: " + e.getMessage());
             e.printStackTrace();
@@ -73,8 +99,11 @@ public class MyPageController {
         
         // モデルに追加
         model.addAttribute("user", user);
-        model.addAttribute("userPosts", userPosts);
-        model.addAttribute("postCount", userPosts.size());
+        model.addAttribute("userPosts", userPosts);           // 親投稿のみ
+        model.addAttribute("userReplies", userReplies);       // 返信のみ
+        model.addAttribute("postCount", userPosts.size());    // 親投稿の数
+        model.addAttribute("replyCount", userReplies.size()); // 返信の数
+        model.addAttribute("totalCount", allPosts.size());    // 全投稿数
         model.addAttribute("daysSinceRegistration", daysSinceRegistration);
         model.addAttribute("loggedInUser", user);
         model.addAttribute("isLoggedIn", true);

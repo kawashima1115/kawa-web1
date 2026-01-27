@@ -130,6 +130,20 @@ body {
 
 .stat-item {
     text-align: center;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.stat-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.stat-item.active {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .stat-value {
@@ -219,11 +233,18 @@ body {
 .delete-btn:hover {
     background: rgba(220, 53, 69, 0.2);
 }
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
 </style>
 </head>
 <body>
 <div class="container">
-    <!-- ヘッダー -->
     <div class="header">
         <h1>マイページ</h1>
         <div>
@@ -234,12 +255,10 @@ body {
         </div>
     </div>
 
-    <!-- メッセージ表示 -->
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
     <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
 
-    <!-- プロフィールカード -->
     <div class="profile-card">
         <h2 th:text="${user.username}">ユーザー名</h2>
         <p th:if="${user.email != null and !user.email.isEmpty()}">
@@ -248,49 +267,114 @@ body {
         <p>登録日: <span th:text="${#temporals.format(user.createdAt, 'yyyy年MM月dd日')}">2024年01月01日</span></p>
         
         <div class="stats">
-            <div class="stat-item">
+            <div class="stat-item active" id="posts-stat" onclick="showTab('posts')">
                 <div class="stat-value" th:text="${postCount}">0</div>
                 <div class="stat-label">投稿数</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value" th:text="${daysSinceRegistration}">0</div>
-                <div class="stat-label">利用日数</div>
+            <div class="stat-item" id="replies-stat" onclick="showTab('replies')">
+                <div class="stat-value" th:text="${replyCount}">0</div>
+                <div class="stat-label">返信数</div>
             </div>
         </div>
     </div>
 
-    <!-- アクションボタン -->
     <div class="actions">
         <a href="/mypage/edit" class="btn">プロフィール編集</a>
         <a href="/mypage/delete-confirm" class="btn btn-danger">アカウント削除</a>
     </div>
 
-    <!-- 投稿一覧 -->
-    <h2 class="section-title">あなたの投稿</h2>
+    <!-- 投稿タブ -->
+    <div id="posts-tab" class="tab-content active">
+        <h2 class="section-title">あなたの投稿</h2>
 
-    <!-- 投稿がない場合 -->
-    <div th:if="${userPosts.isEmpty()}" class="empty-state">
-        <p>まだ投稿がありません</p>
-        <p><a href="/">トップページ</a>から投稿してみましょう!</p>
+        <div th:if="${userPosts.isEmpty()}" class="empty-state">
+            <p>まだ投稿がありません</p>
+            <p><a href="/">トップページ</a>から投稿してみましょう!</p>
+        </div>
+
+        <div th:unless="${userPosts.isEmpty()}">
+            <div th:each="post : ${userPosts}" class="post">
+                <div class="post-header">
+                    <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                    
+                    <form action="/post/delete" method="post" style="display: inline;" 
+                          onsubmit="return confirm('本当に削除しますか?');">
+                        <input type="hidden" name="postId" th:value="${post.id}">
+                        <button type="submit" class="delete-btn">削除</button>
+                    </form>
+                </div>
+                
+                <div class="post-content" th:utext="${post.content}">投稿内容</div>
+            </div>
+        </div>
     </div>
 
-    <!-- 投稿一覧 -->
-    <div th:unless="${userPosts.isEmpty()}">
-        <div th:each="post : ${userPosts}" class="post">
-            <div class="post-header">
-                <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+    <!-- 返信タブ -->
+    <div id="replies-tab" class="tab-content">
+        <h2 class="section-title">あなたの返信</h2>
+
+        <div th:if="${userReplies == null or userReplies.isEmpty()}" class="empty-state">
+            <p>まだ返信がありません</p>
+        </div>
+
+        <div th:if="${userReplies != null and !userReplies.isEmpty()}">
+            <div th:each="reply : ${userReplies}" class="post">
+                <div class="post-header">
+                    <div>
+                        <span th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                        <span style="color: #6c757d; font-size: 12px; margin-left: 10px;" th:if="${reply.parent != null}">
+                            → <strong th:text="${reply.parent.username}">ユーザー名</strong>への返信
+                        </span>
+                    </div>
+                    
+                    <form action="/post/delete" method="post" style="display: inline;" 
+                          onsubmit="return confirm('本当に削除しますか?');">
+                        <input type="hidden" name="postId" th:value="${reply.id}">
+                        <button type="submit" class="delete-btn">削除</button>
+                    </form>
+                </div>
                 
-                <form action="/post/delete" method="post" style="display: inline;" 
-                      onsubmit="return confirm('本当に削除しますか?');">
-                    <input type="hidden" name="postId" th:value="${post.id}">
-					
-                    <button type="submit" class="delete-btn">削除</button>
-                </form>
+                <div class="post-content" th:utext="${reply.content}">返信内容</div>
+                
+                <div th:if="${reply.parent != null}" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #2e7d32;">
+                    <div style="font-size: 12px; color: #6c757d; margin-bottom: 5px;">元の投稿:</div>
+                    <div style="font-size: 13px; color: #495057;" th:utext="${reply.parent.content}">元の投稿内容</div>
+                </div>
             </div>
-            
-            <div class="post-content" th:utext="${post.content}">投稿内容</div>
         </div>
     </div>
 </div>
+
+<script>
+function showTab(tabName) {
+    console.log('showTab called:', tabName);
+    
+    const postsTab = document.getElementById('posts-tab');
+    const repliesTab = document.getElementById('replies-tab');
+    const postsStat = document.getElementById('posts-stat');
+    const repliesStat = document.getElementById('replies-stat');
+    
+    // 全てのタブを非表示
+    postsTab.classList.remove('active');
+    repliesTab.classList.remove('active');
+    postsStat.classList.remove('active');
+    repliesStat.classList.remove('active');
+    
+    // 選択されたタブを表示
+    if (tabName === 'posts') {
+        postsTab.classList.add('active');
+        postsStat.classList.add('active');
+        console.log('Posts tab activated');
+    } else if (tabName === 'replies') {
+        repliesTab.classList.add('active');
+        repliesStat.classList.add('active');
+        console.log('Replies tab activated');
+    }
+}
+
+// ページ読み込み時に投稿タブをアクティブに（既にHTMLで設定済み）
+console.log('Page loaded');
+</script>
+
 </body>
 </html>

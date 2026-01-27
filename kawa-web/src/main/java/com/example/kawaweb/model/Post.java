@@ -112,6 +112,11 @@ public class Post {
         return parent != null;
     }
     
+    // 親投稿かどうかを判定
+    public boolean isParentPost() {
+        return parent == null;
+    }
+    
     // 返信数を取得
     public int getReplyCount() {
         return replies != null ? replies.size() : 0;
