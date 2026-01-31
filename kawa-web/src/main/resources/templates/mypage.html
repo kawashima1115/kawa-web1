@@ -382,6 +382,171 @@ body {
 .tab-content.active {
     display: block;
 }
+
+/* 設定モーダル */
+.settings-btn {
+    background: rgba(108, 117, 125, 0.1);
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.settings-btn:hover {
+    background: rgba(108, 117, 125, 0.15);
+    transform: translateY(-1px);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.modal-header h3 {
+    font-size: 22px;
+    color: #495057;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(108, 117, 125, 0.1);
+    color: #495057;
+}
+
+.settings-section {
+    margin-bottom: 25px;
+}
+
+.settings-section h4 {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+}
+
+.settings-item-info {
+    flex: 1;
+}
+
+.settings-item-title {
+    font-size: 15px;
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.settings-item-desc {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.btn-modal {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-modal-secondary {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.btn-modal-secondary:hover {
+    background: rgba(108, 117, 125, 0.2);
+}
+
+.btn-modal-danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.btn-modal-danger:hover {
+    background: #dc3545;
+    color: white;
+}
 </style>
 </head>
 <body>
@@ -389,10 +554,8 @@ body {
     <div class="header">
         <h1>マイページ</h1>
         <div class="header-actions">
+            <button class="settings-btn" onclick="openSettings()">設定</button>
             <a href="/" class="btn btn-secondary">トップページ</a>
-            <form action="/logout" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-danger">ログアウト</button>
-            </form>
         </div>
     </div>
 
@@ -404,7 +567,10 @@ body {
         <div class="profile-header">
             <div class="avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</div>
             <div class="profile-info">
-                <h2 th:text="${user.username}">ユーザー名</h2>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h2 th:text="${user.username}">ユーザー名</h2>
+                    <a href="/mypage/edit" class="btn btn-primary" style="font-size: 13px; padding: 5px 12px;">プロフィール編集</a>
+                </div>
                 <p th:if="${user.email != null and !user.email.isEmpty()}" th:text="${user.email}">email@example.com</p>
                 <p th:text="'登録日: ' + ${#temporals.format(user.createdAt, 'yyyy年MM月dd日')}">登録日: 2024年01月01日</p>
             </div>
@@ -420,11 +586,6 @@ body {
                 <div class="stat-label">返信数</div>
             </div>
         </div>
-    </div>
-
-    <div class="actions">
-        <a href="/mypage/edit" class="btn btn-primary">プロフィール編集</a>
-        <a href="/mypage/delete-confirm" class="btn btn-danger">アカウント削除</a>
     </div>
 
     <!-- 投稿タブ -->
@@ -491,6 +652,66 @@ body {
     </div>
 </div>
 
+<!-- 設定モーダル -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>設定</h3>
+            <button class="modal-close" onclick="closeSettings()">&times;</button>
+        </div>
+
+        <!-- データ管理 -->
+        <div class="settings-section">
+            <h4>データ管理</h4>
+            
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-title">投稿を全て削除</div>
+                    <div class="settings-item-desc">あなたの全ての投稿を削除します（返信は残ります）</div>
+                </div>
+                <form action="/mypage/delete-all-posts" method="post" style="display: inline;" 
+                      onsubmit="return confirm('全ての投稿を削除しますか？この操作は取り消せません。');">
+                    <button type="submit" class="btn-modal btn-modal-danger">削除</button>
+                </form>
+            </div>
+
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-title">返信を全て削除</div>
+                    <div class="settings-item-desc">あなたの全ての返信を削除します（投稿は残ります）</div>
+                </div>
+                <form action="/mypage/delete-all-replies" method="post" style="display: inline;" 
+                      onsubmit="return confirm('全ての返信を削除しますか？この操作は取り消せません。');">
+                    <button type="submit" class="btn-modal btn-modal-danger">削除</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- アカウント -->
+        <div class="settings-section">
+            <h4>アカウント</h4>
+            
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-title">ログアウト</div>
+                    <div class="settings-item-desc">このアカウントからログアウトします</div>
+                </div>
+                <form action="/logout" method="post" style="display: inline;">
+                     <button type="submit" class="btn-modal btn-modal-danger">ログアウト</button>
+                </form>
+            </div>
+
+            <div class="settings-item">
+                <div class="settings-item-info">
+                    <div class="settings-item-title">アカウント削除</div>
+                    <div class="settings-item-desc">アカウントと全てのデータを完全に削除します</div>
+                </div>
+                <a href="/mypage/delete-confirm" class="btn-modal btn-modal-danger" style="text-decoration: none;">削除</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function showTab(tabName) {
     const postsTab = document.getElementById('posts-tab');
@@ -511,6 +732,21 @@ function showTab(tabName) {
         repliesStat.classList.add('active');
     }
 }
+
+function openSettings() {
+    document.getElementById('settingsModal').classList.add('active');
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').classList.remove('active');
+}
+
+// モーダル外をクリックで閉じる
+document.getElementById('settingsModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeSettings();
+    }
+});
 </script>
 
 </body>

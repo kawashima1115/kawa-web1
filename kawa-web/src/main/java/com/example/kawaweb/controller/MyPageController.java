@@ -252,4 +252,77 @@ public class MyPageController {
         redirectAttributes.addFlashAttribute("success", "アカウントを削除しました");
         return "redirect:/";
     }
+    
+    // 投稿を全て削除
+    @PostMapping("/mypage/delete-all-posts")
+    public String deleteAllPosts(HttpSession session, RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        try {
+            // 親投稿のみを取得して削除
+            List<Post> posts = postRepository.findByUserOrderByCreatedAtDesc(loggedInUser);
+            List<Post> parentPosts = posts.stream()
+                    .filter(post -> post.getParent() == null)
+                    .collect(Collectors.toList());
+            
+            postRepository.deleteAll(parentPosts);
+            redirectAttributes.addFlashAttribute("success", "全ての投稿を削除しました");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "削除中にエラーが発生しました");
+        }
+        
+        return "redirect:/mypage";
+    }
+    
+    // 返信を全て削除
+    @PostMapping("/mypage/delete-all-replies")
+    public String deleteAllReplies(HttpSession session, RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        try {
+            // 返信のみを取得して削除
+            List<Post> posts = postRepository.findByUserOrderByCreatedAtDesc(loggedInUser);
+            List<Post> replies = posts.stream()
+                    .filter(post -> post.getParent() != null)
+                    .collect(Collectors.toList());
+            
+            postRepository.deleteAll(replies);
+            redirectAttributes.addFlashAttribute("success", "全ての返信を削除しました");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "削除中にエラーが発生しました");
+        }
+        
+        return "redirect:/mypage";
+    }
+    
+    // 投稿と返信を全て削除
+    @PostMapping("/mypage/delete-all-content")
+    public String deleteAllContent(HttpSession session, RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        try {
+            List<Post> allPosts = postRepository.findByUserOrderByCreatedAtDesc(loggedInUser);
+            postRepository.deleteAll(allPosts);
+            redirectAttributes.addFlashAttribute("success", "全ての投稿と返信を削除しました");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "削除中にエラーが発生しました");
+        }
+        
+        return "redirect:/mypage";
+    }
 }
