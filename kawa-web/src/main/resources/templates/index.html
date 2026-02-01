@@ -318,11 +318,20 @@
         font-weight: 600;
     }
     
+    .user-id {
+        color: #6c757d;
+        font-size: 12px;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
     .timestamp {
         color: #6c757d;
         font-size: 12px;
         background: rgba(46, 125, 50, 0.1);
-        padding: 4px 8px;
+        padding: 2px 8px;
         border-radius: 4px;
     }
     
@@ -558,7 +567,10 @@
                      th:text="${#strings.substring(post.username, 0, 1).toUpperCase()}">U</div>
                 <div>
                     <strong th:text="${post.username}">ユーザー名</strong>
-                    <div class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</div>
+                    <div class="user-id">
+                        <span th:text="'@' + ${post.user.userId}">@user_id</span>
+                        <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -617,21 +629,87 @@
                              th:text="${#strings.substring(reply.username, 0, 1).toUpperCase()}">U</div>
                         <div>
                             <strong th:text="${reply.username}">ユーザー名</strong>
-                            <div class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</div>
+                            <div class="user-id">
+                                <span th:text="'@' + ${reply.user.userId}">@user_id</span>
+                                <span class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="post-content" th:utext="${reply.content}">返信内容</div>
                 
-                <!-- 返信の削除ボタン -->
-                <form th:if="${isLoggedIn and loggedInUser.id == reply.user.id}" 
-                      action="/post/delete" method="post" 
-                      style="display: inline;"
-                      onsubmit="return confirm('本当に削除しますか？');">
-                    <input type="hidden" name="postId" th:value="${reply.id}">
-                    <button type="submit" class="delete-btn">削除</button>
-                </form>
+                <!-- 返信アクション -->
+                <div class="post-actions">
+                    <!-- 返信に返信ボタン -->
+                    <button th:if="${isLoggedIn}" 
+                            class="reply-btn" 
+                            th:onclick="'toggleReplyForm(' + ${reply.id} + ')'">
+                        💬 返信する
+                    </button>
+                    
+                    <!-- ネストした返信数表示 -->
+                    <span class="reply-count" th:if="${reply.replyCount > 0}">
+                        <span th:text="${reply.replyCount}">0</span>件の返信
+                    </span>
+                    
+                    <!-- 削除ボタン -->
+                    <form th:if="${isLoggedIn and loggedInUser.id == reply.user.id}" 
+                          action="/post/delete" method="post" 
+                          style="display: inline;"
+                          onsubmit="return confirm('本当に削除しますか？');">
+                        <input type="hidden" name="postId" th:value="${reply.id}">
+                        <button type="submit" class="delete-btn">削除</button>
+                    </form>
+                </div>
+                
+                <!-- 返信に対する返信フォーム -->
+                <div th:if="${isLoggedIn}" class="reply-form" th:id="'reply-form-' + ${reply.id}">
+                    <form th:id="'replyForm-' + ${reply.id}" action="/post/reply" method="post">
+                        <input type="hidden" name="parentId" th:value="${reply.id}">
+                        <div th:id="'reply-editor-' + ${reply.id}" class="reply-editor"></div>
+                        <input type="hidden" th:id="'reply-content-' + ${reply.id}" name="content" required>
+                        <div class="reply-form-actions">
+                            <button type="button" class="btn-cancel" th:onclick="'toggleReplyForm(' + ${reply.id} + ')'">
+                                キャンセル
+                            </button>
+                            <button type="submit" class="btn-submit">返信を投稿</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- ネストした返信の表示（再帰的） -->
+                <div th:if="${!reply.replies.isEmpty()}" class="replies">
+                    <div th:each="nestedReply : ${reply.replies}" class="reply-item">
+                        <div class="post-header">
+                            <div class="post-header-left">
+                                <div class="user-avatar" th:if="${nestedReply.user.iconPath != null}">
+                                    <img th:src="@{'/uploads/icons/' + ${nestedReply.user.iconPath}}" alt="アイコン">
+                                </div>
+                                <div class="user-avatar" th:if="${nestedReply.user.iconPath == null}" 
+                                     th:text="${#strings.substring(nestedReply.username, 0, 1).toUpperCase()}">U</div>
+                                <div>
+                                    <strong th:text="${nestedReply.username}">ユーザー名</strong>
+                                    <div class="user-id">
+                                        <span th:text="'@' + ${nestedReply.user.userId}">@user_id</span>
+                                        <span class="timestamp" th:text="${#temporals.format(nestedReply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="post-content" th:utext="${nestedReply.content}">ネストした返信内容</div>
+                        
+                        <!-- ネストした返信の削除ボタン -->
+                        <form th:if="${isLoggedIn and loggedInUser.id == nestedReply.user.id}" 
+                              action="/post/delete" method="post" 
+                              style="display: inline;"
+                              onsubmit="return confirm('本当に削除しますか？');">
+                            <input type="hidden" name="postId" th:value="${nestedReply.id}">
+                            <button type="submit" class="delete-btn">削除</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
