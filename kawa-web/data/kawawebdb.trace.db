@@ -1522,3 +1522,39 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/javaspring/gi
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:286)
 	... 58 more
+2026-02-02 01:27:32.295325+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (443)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (443)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:27:49.644574+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (307)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (307)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:30:00.838008+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (482)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (482)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:30:07.273200+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (370)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h2>\\65e5\\672c\\306e\\30ef\\30a4\\30f3\\30dc\\30c8\\30eb\\304c\\5c0f\\3055\\3044\\7406\\75... (370)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:35:40.550293+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h3>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\... (552)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h3>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\... (552)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:35:49.894271+09:00 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h3>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\... (337)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h3>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\... (337)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:36:02.150599+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<p>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\3... (328)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<p>17\\4e16\\7d00\\30c8\\30eb\\30b3\\3067\\306f\\30b3\\30fc\\30d2\\30fc\\3092\\98f2\\3080\\3... (328)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:48:09.710239+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h1><strong style=""color: rgb(255, 153, 0);""><em>\\91d1\\7b94</em></strong><str... (512)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h1><strong style=""color: rgb(255, 153, 0);""><em>\\91d1\\7b94</em></strong><str... (512)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-02 01:49:11.770819+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<h1><strong style=""color: rgb(255, 153, 0);"">\\30c8\\30a6\\30e2\\30ed\\30b3\\30b7</... (325)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<h1><strong style=""color: rgb(255, 153, 0);"">\\30c8\\30a6\\30e2\\30ed\\30b3\\30b7</... (325)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]

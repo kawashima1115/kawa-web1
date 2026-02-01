@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,32 +15,40 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
+@Table(name = "post")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    // 投稿内容（HTMLを含むリッチテキスト）- TEXTタイプに変更して長文対応
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    // ユーザーとの関連（多対一）
-    @ManyToOne
+    // 投稿日時
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    // 投稿者（Userエンティティとの多対一の関係）
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // 親投稿との関連（返信の場合）
-    @ManyToOne
+    // 親投稿（返信の場合のみ設定される）
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Post parent;
 
-    // 返信リスト（この投稿に対する返信）
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    // 子投稿（この投稿への返信）
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> replies = new ArrayList<>();
 
-    private LocalDateTime createdAt;
-
+    // 保存前に自動で現在日時をセット
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -48,7 +57,7 @@ public class Post {
     // デフォルトコンストラクタ
     public Post() {}
 
-    // 通常の投稿用コンストラクタ
+    // コンストラクタ
     public Post(String content, User user) {
         this.content = content;
         this.user = user;
@@ -61,9 +70,13 @@ public class Post {
         this.parent = parent;
     }
 
-    // getter/setter
+    // Getter/Setter
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getContent() {
@@ -72,6 +85,14 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public User getUser() {
@@ -98,35 +119,15 @@ public class Post {
         this.replies = replies;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    // ユーザー名を取得する便利メソッド
+    // Thymeleafテンプレートで使用するヘルパーメソッド
+    @Transient
     public String getUsername() {
-        return user != null ? user.getUsername() : "匿名";
+        return user != null ? user.getUsername() : "Unknown";
     }
 
-    // 返信かどうかを判定
-    public boolean isReply() {
-        return parent != null;
-    }
-
-    // 親投稿かどうかを判定
-    public boolean isParentPost() {
-        return parent == null;
-    }
-
-    // 返信数を取得（全てのネスト返信を含む）
+    @Transient
     public int getReplyCount() {
-        if (replies == null || replies.isEmpty()) {
-            return 0;
-        }
-        int count = replies.size();
-        for (Post reply : replies) {
-            count += reply.getReplyCount();
-        }
-        return count;
+        return replies != null ? replies.size() : 0;
     }
 
     @Override
@@ -134,10 +135,9 @@ public class Post {
         return "Post{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
-                ", username='" + getUsername() + '\'' +
-                ", parentId=" + (parent != null ? parent.getId() : null) +
-                ", replyCount=" + getReplyCount() +
                 ", createdAt=" + createdAt +
+                ", userId=" + (user != null ? user.getId() : null) +
+                ", parentId=" + (parent != null ? parent.getId() : null) +
                 '}';
     }
 }
