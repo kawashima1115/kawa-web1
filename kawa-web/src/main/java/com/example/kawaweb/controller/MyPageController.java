@@ -1,8 +1,13 @@
 package com.example.kawaweb.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
@@ -13,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.kawaweb.model.Post;
@@ -28,6 +34,9 @@ public class MyPageController {
     
     @Autowired
     private PostRepository postRepository;
+    
+    // アップロードされた画像を保存するディレクトリ
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/icons/";
     
     // マイページ表示
     @GetMapping("/mypage")
@@ -138,9 +147,9 @@ public class MyPageController {
     // プロフィール更新
     @PostMapping("/mypage/update")
     public String updateProfile(
-            @RequestParam(required = false) String email,
             @RequestParam(required = false) String currentPassword,
             @RequestParam(required = false) String newPassword,
+            @RequestParam(required = false) MultipartFile iconFile,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         
@@ -160,18 +169,48 @@ public class MyPageController {
         User user = userOpt.get();
         boolean updated = false;
         
-        // メールアドレス更新
-        if (email != null && !email.trim().isEmpty()) {
-            Optional<User> existingUser = userRepository.findByEmail(email.trim());
-            if (existingUser.isPresent() && !existingUser.get().getId().equals(user.getId())) {
-                redirectAttributes.addFlashAttribute("error", "そのメールアドレスは既に使用されています");
+        // アイコン画像の処理
+        if (iconFile != null && !iconFile.isEmpty()) {
+            try {
+                // アップロードディレクトリを作成
+                Path uploadPath = Paths.get(UPLOAD_DIR);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                
+                // ファイル名をユニークにする
+                String originalFilename = iconFile.getOriginalFilename();
+                String extension = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                String filename = UUID.randomUUID().toString() + extension;
+                
+                // ファイルを保存
+                Path filePath = uploadPath.resolve(filename);
+                Files.write(filePath, iconFile.getBytes());
+                
+                // 古いアイコンファイルを削除（デフォルトアイコンでない場合）
+                if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
+                    try {
+                        Path oldFile = Paths.get(UPLOAD_DIR + user.getIconPath());
+                        Files.deleteIfExists(oldFile);
+                    } catch (IOException e) {
+                        System.out.println("古いアイコンの削除に失敗: " + e.getMessage());
+                    }
+                }
+                
+                // データベースに保存するのはファイル名のみ
+                user.setIconPath(filename);
+                updated = true;
+                
+                System.out.println("アイコンアップロード成功: " + filename);
+            } catch (IOException e) {
+                System.out.println("アイコンアップロードエラー: " + e.getMessage());
+                e.printStackTrace();
+                redirectAttributes.addFlashAttribute("error", "アイコンのアップロードに失敗しました");
                 return "redirect:/mypage/edit";
             }
-            user.setEmail(email.trim());
-            updated = true;
-        } else {
-            user.setEmail(null);
-            updated = true;
         }
         
         // パスワード更新
@@ -201,6 +240,47 @@ public class MyPageController {
         }
         
         return "redirect:/mypage";
+    }
+    
+    // アイコン削除
+    @PostMapping("/mypage/delete-icon")
+    public String deleteIcon(HttpSession session, RedirectAttributes redirectAttributes) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        Optional<User> userOpt = userRepository.findById(loggedInUser.getId());
+        if (userOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー情報が見つかりません");
+            return "redirect:/";
+        }
+        
+        User user = userOpt.get();
+        
+        if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
+            try {
+                // ファイルを削除
+                Path filePath = Paths.get(UPLOAD_DIR + user.getIconPath());
+                Files.deleteIfExists(filePath);
+                
+                // データベースからも削除
+                user.setIconPath(null);
+                userRepository.save(user);
+                session.setAttribute("loggedInUser", user);
+                
+                redirectAttributes.addFlashAttribute("success", "アイコンを削除しました");
+            } catch (IOException e) {
+                System.out.println("アイコン削除エラー: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("error", "アイコンの削除に失敗しました");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("info", "削除するアイコンがありません");
+        }
+        
+        return "redirect:/mypage/edit";
     }
     
     // アカウント削除確認
@@ -244,6 +324,16 @@ public class MyPageController {
         if (!user.getPassword().equals(password)) {
             redirectAttributes.addFlashAttribute("error", "パスワードが間違っています");
             return "redirect:/mypage/delete-confirm";
+        }
+        
+        // アイコンファイルを削除
+        if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
+            try {
+                Path filePath = Paths.get(UPLOAD_DIR + user.getIconPath());
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                System.out.println("アイコン削除エラー: " + e.getMessage());
+            }
         }
         
         userRepository.delete(user);

@@ -768,3 +768,11 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: C:/javaspring/gi
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:286)
 	... 58 more
+2026-02-01 03:11:51.955947+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<p>\\732b\\53ef\\611b\\3044</p><p><img style=""display: block;-webkit-user-select:... (433)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<p>\\732b\\53ef\\611b\\3044</p><p><img style=""display: block;-webkit-user-select:... (433)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]
+2026-02-01 03:11:59.148213+09:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: 列 "CONTENT CHARACTER VARYING(255)" の値が長過ぎます: "U&'<p>\\732b\\53ef\\611b\\3044</p><p><img style=""display: block;-webkit-user-select:... (433)"
+Value too long for column "CONTENT CHARACTER VARYING(255)": "U&'<p>\\732b\\53ef\\611b\\3044</p><p><img style=""display: block;-webkit-user-select:... (433)"; SQL statement:
+insert into post (content,created_at,parent_id,user_id,id) values (?,?,?,?,default) [22001-232]

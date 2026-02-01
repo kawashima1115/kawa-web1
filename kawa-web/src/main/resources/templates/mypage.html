@@ -72,12 +72,12 @@ body {
 }
 
 .btn-secondary {
-    background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
+	background: rgba(0, 123, 255, 0.1);
+	color: #007bff;
 }
 
 .btn-secondary:hover {
-    background: rgba(108, 117, 125, 0.15);
+    background: rgba(0, 123, 255, 0.15);
     transform: translateY(-1px);
 }
 
@@ -132,16 +132,24 @@ body {
 }
 
 .avatar {
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: #2e7d32;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 48px;
     font-weight: 700;
     color: white;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .profile-info h2 {
@@ -554,8 +562,8 @@ body {
     <div class="header">
         <h1>マイページ</h1>
         <div class="header-actions">
+			<a href="/" class="btn btn-secondary">トップページ</a>
             <button class="settings-btn" onclick="openSettings()">設定</button>
-            <a href="/" class="btn btn-secondary">トップページ</a>
         </div>
     </div>
 
@@ -565,7 +573,13 @@ body {
 
     <div class="profile-card">
         <div class="profile-header">
-            <div class="avatar" th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</div>
+            <div class="avatar">
+                <img th:if="${user.iconPath != null}" 
+                     th:src="@{'/uploads/icons/' + ${user.iconPath}}" 
+                     alt="プロフィールアイコン">
+                <span th:if="${user.iconPath == null}" 
+                      th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</span>
+            </div>
             <div class="profile-info">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <h2 th:text="${user.username}">ユーザー名</h2>

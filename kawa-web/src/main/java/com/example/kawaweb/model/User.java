@@ -1,8 +1,6 @@
 package com.example.kawaweb.model;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,31 +10,36 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "app_users")  // DBテーブル名を「app_users」に指定
 public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
-    // 主キー（自動採番）
+    // 主キー(自動採番)
     private Long id;
     
     @Column(unique = true, nullable = false)
-    // ユーザー名（重複不可、null不可）
+    // ユーザー名(重複不可、null不可)
     private String username;
     
     @Column(nullable = false)
-    // パスワード（必須）
+    // パスワード(必須)
     private String password;
     
-    // メールアドレス（必須ではない）
+    // メールアドレス(必須ではない)
     private String email;
+    
+    // プロフィールアイコン画像のパス
+    private String iconPath;
+    
+    // アイコン更新日時
+    private LocalDateTime iconUpdatedAt;
     
     // 登録日時
     private LocalDateTime createdAt;
     
-    // ユーザーが作成した投稿（Post エンティティ）との 1対多 関係
+    // ユーザーが作成した投稿(Post エンティティ)との 1対多 関係
     // mappedBy="user" → Post 側にある「user」フィールドが外部キーを持つ
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;
@@ -47,7 +50,7 @@ public class User {
         createdAt = LocalDateTime.now();
     }
     
-    // デフォルトコンストラクタ（JPAが内部的に利用）
+    // デフォルトコンストラクタ(JPAが内部的に利用)
     public User() {}
     
     // 任意の初期値を入れるためのコンストラクタ
@@ -57,7 +60,7 @@ public class User {
         this.email = email;
     }
     
-    // getter/setter（プロパティアクセス用）
+    // getter/setter(プロパティアクセス用)
     public Long getId() {
         return id;
     }
@@ -86,6 +89,23 @@ public class User {
         this.email = email;
     }
     
+    public String getIconPath() {
+        return iconPath;
+    }
+    
+    public void setIconPath(String iconPath) {
+        this.iconPath = iconPath;
+        this.iconUpdatedAt = LocalDateTime.now(); // アイコン変更時に更新
+    }
+    
+    public LocalDateTime getIconUpdatedAt() {
+        return iconUpdatedAt;
+    }
+    
+    public void setIconUpdatedAt(LocalDateTime iconUpdatedAt) {
+        this.iconUpdatedAt = iconUpdatedAt;
+    }
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -101,7 +121,6 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
-
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -113,6 +132,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", iconPath='" + iconPath + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
     }

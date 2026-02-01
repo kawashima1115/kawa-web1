@@ -67,6 +67,14 @@ body {
     background: #5a6268;
 }
 
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
 .alert {
     padding: 15px;
     margin-bottom: 20px;
@@ -176,6 +184,73 @@ body {
     font-size: 13px;
     color: #856404;
 }
+
+/* アイコンプレビュー */
+.icon-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.icon-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #2e7d32;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.icon-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.icon-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #2e7d32;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.file-input-label:hover {
+    background: #1b5e20;
+}
+
+.file-input-label input {
+    display: none;
+}
+
+.selected-file {
+    font-size: 12px;
+    color: #495057;
+    margin-top: 5px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
+}
 </style>
 </head>
 <body>
@@ -194,15 +269,43 @@ body {
     <!-- 現在の情報表示 -->
     <div class="current-info">
         <p><strong>現在のユーザー名:</strong> <span th:text="${user.username}">username</span></p>
-        <p th:if="${user.email != null and !user.email.isEmpty()}">
-            <strong>現在のメールアドレス:</strong> <span th:text="${user.email}">email@example.com</span>
-        </p>
-        <p th:if="${user.email == null or user.email.isEmpty()}">
-            <strong>現在のメールアドレス:</strong> 未設定
-        </p>
     </div>
 
-    <form action="/mypage/update" method="post">
+    <form action="/mypage/update" method="post" enctype="multipart/form-data" autocomplete="off">
+        <!-- アイコン設定セクション -->
+        <div class="form-section">
+            <h2>プロフィールアイコン</h2>
+            
+            <div class="icon-preview-container">
+                <div class="icon-preview" id="iconPreview">
+                    <img th:if="${user.iconPath != null}" 
+                         th:src="@{'/uploads/icons/' + ${user.iconPath}}" 
+                         alt="現在のアイコン">
+                    <span th:if="${user.iconPath == null}" 
+                          th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</span>
+                </div>
+                
+                <div class="icon-actions">
+                    <label class="file-input-label">
+                        アイコンを選択
+                        <input type="file" name="iconFile" id="iconFile" accept="image/*" onchange="previewIcon(event)">
+                    </label>
+                    <div id="selectedFile" class="selected-file"></div>
+                    
+                    <button th:if="${user.iconPath != null}" 
+                            type="button" 
+                            class="btn btn-danger btn-small"
+                            onclick="deleteIcon()">
+                        アイコンを削除
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-help">
+                推奨: 正方形の画像 (JPG, PNG, GIF形式)
+            </div>
+        </div>
+        
         <!-- 基本情報セクション -->
         <div class="form-section">
             <h2>基本情報</h2>
@@ -212,14 +315,6 @@ body {
                 <input type="text" id="username" name="username" 
                        th:value="${user.username}" disabled>
                 <div class="form-help">※ユーザー名は変更できません</div>
-            </div>
-
-            <div class="form-group">
-                <label for="email">メールアドレス</label>
-                <input type="email" id="email" name="email" 
-                       th:value="${user.email}" 
-                       placeholder="email@example.com">
-                <div class="form-help">メールアドレスを変更または削除できます（空欄で削除）</div>
             </div>
         </div>
 
@@ -234,26 +329,23 @@ body {
             <div class="form-group">
                 <label for="currentPassword">現在のパスワード</label>
                 <input type="password" id="currentPassword" name="currentPassword" 
-                       value=""
                        placeholder="現在のパスワードを入力"
-                       autocomplete="off">
+                       autocomplete="new-password">
             </div>
 
             <div class="form-group">
                 <label for="newPassword">新しいパスワード</label>
                 <input type="password" id="newPassword" name="newPassword" 
-                       value=""
                        placeholder="新しいパスワード（8文字以上）"
-                       autocomplete="off">
+                       autocomplete="new-password">
                 <div class="form-help">8文字以上で設定してください</div>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">新しいパスワード（確認）</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" 
-                       value=""
                        placeholder="もう一度入力してください"
-                       autocomplete="off">
+                       autocomplete="new-password">
             </div>
         </div>
 
@@ -266,14 +358,41 @@ body {
 </div>
 
 <script>
+// アイコン削除関数
+function deleteIcon() {
+    if (confirm('アイコンを削除しますか？')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/mypage/delete-icon';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// アイコンプレビュー機能
+function previewIcon(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('iconPreview');
+    const selectedFile = document.getElementById('selectedFile');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = '<img src="' + e.target.result + '" alt="プレビュー">';
+        };
+        reader.readAsDataURL(file);
+        selectedFile.textContent = '選択: ' + file.name;
+    }
+}
+
 // パスワード確認のバリデーション
 document.querySelector('form').addEventListener('submit', function(e) {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const currentPassword = document.getElementById('currentPassword').value;
     
-    // パスワード変更を試みている場合
-    if (newPassword || confirmPassword || currentPassword) {
+    // パスワード変更を試みている場合のみバリデーション
+    if (currentPassword || newPassword || confirmPassword) {
         // 現在のパスワードが未入力
         if (!currentPassword) {
             e.preventDefault();
