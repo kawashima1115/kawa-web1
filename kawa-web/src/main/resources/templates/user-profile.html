@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>マイページ - kawa-web</title>
+<title th:text="${user.username} + 'のプロフィール - kawa-web'">プロフィール - kawa-web</title>
 <style>
 * {
     margin: 0;
@@ -72,22 +72,12 @@ body {
 }
 
 .btn-secondary {
-	background: rgba(0, 123, 255, 0.1);
-	color: #007bff;
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
 }
 
 .btn-secondary:hover {
     background: rgba(0, 123, 255, 0.15);
-    transform: translateY(-1px);
-}
-
-.btn-danger {
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-}
-
-.btn-danger:hover {
-    background: rgba(220, 53, 69, 0.15);
     transform: translateY(-1px);
 }
 
@@ -182,15 +172,6 @@ body {
     border-radius: 6px;
 }
 
-.bio-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #2e7d32;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
-}
-
 .bio-text {
     color: #495057;
     font-size: 16px;
@@ -252,13 +233,6 @@ body {
     font-weight: 600;
 }
 
-.actions {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 30px;
-}
-
 .section-title {
     font-size: 20px;
     font-weight: 600;
@@ -292,12 +266,6 @@ body {
 .empty-state p {
     margin: 10px 0;
     font-size: 16px;
-}
-
-.empty-state a {
-    color: #2e7d32;
-    text-decoration: none;
-    font-weight: 600;
 }
 
 .post {
@@ -385,6 +353,14 @@ body {
     overflow-x: auto;
 }
 
+.post-content code {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+}
+
 .original-post {
     margin-top: 15px;
     padding: 12px;
@@ -407,23 +383,6 @@ body {
     line-height: 1.5;
 }
 
-.delete-btn {
-    background: rgba(220, 53, 69, 0.1);
-    border: none;
-    color: #dc3545;
-    cursor: pointer;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    transition: all 0.3s ease;
-}
-
-.delete-btn:hover {
-    background: rgba(220, 53, 69, 0.2);
-    transform: translateY(-1px);
-}
-
 .tab-content {
     display: none;
 }
@@ -431,180 +390,15 @@ body {
 .tab-content.active {
     display: block;
 }
-
-/* 設定モーダル */
-.settings-btn {
-    background: rgba(108, 117, 125, 0.1);
-    border: none;
-    color: #6c757d;
-    cursor: pointer;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    font-size: 14px;
-}
-
-.settings-btn:hover {
-    background: rgba(108, 117, 125, 0.15);
-    transform: translateY(-1px);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    animation: fadeIn 0.2s ease;
-}
-
-.modal.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-content {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e1e5e9;
-}
-
-.modal-header h3 {
-    font-size: 22px;
-    color: #495057;
-    font-weight: 700;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 28px;
-    color: #6c757d;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-    background: rgba(108, 117, 125, 0.1);
-    color: #495057;
-}
-
-.settings-section {
-    margin-bottom: 25px;
-}
-
-.settings-section h4 {
-    font-size: 14px;
-    color: #6c757d;
-    font-weight: 600;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.settings-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-}
-
-.settings-item-info {
-    flex: 1;
-}
-
-.settings-item-title {
-    font-size: 15px;
-    color: #495057;
-    font-weight: 600;
-    margin-bottom: 3px;
-}
-
-.settings-item-desc {
-    font-size: 13px;
-    color: #6c757d;
-}
-
-.btn-modal {
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 13px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-modal-secondary {
-    background: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-}
-
-.btn-modal-secondary:hover {
-    background: rgba(108, 117, 125, 0.2);
-}
-
-.btn-modal-danger {
-    background: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-}
-
-.btn-modal-danger:hover {
-    background: #dc3545;
-    color: white;
-}
 </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>マイページ</h1>
+        <h1 th:text="${user.username} + 'のプロフィール'">プロフィール</h1>
         <div class="header-actions">
-			<a href="/" class="btn btn-secondary">トップページ</a>
-            <button class="settings-btn" onclick="openSettings()">設定</button>
+            <a href="/" class="btn btn-secondary">トップページ</a>
+            <a th:if="${isLoggedIn}" href="/mypage" class="btn btn-primary">マイページ</a>
         </div>
     </div>
 
@@ -622,12 +416,9 @@ body {
                       th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</span>
             </div>
             <div class="profile-info">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <h2 th:text="${user.username}">ユーザー名</h2>
-                    <a href="/mypage/edit" class="btn btn-primary" style="font-size: 13px; padding: 5px 12px;">プロフィール編集</a>
-                </div>
+                <h2 th:text="${user.username}">ユーザー名</h2>
                 <div class="user-id" th:text="${user.userId}">user_id</div>
-                <p th:if="${user.email != null and !user.email.isEmpty()}" th:text="${user.email}"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="583d35393134183d20393528343d763b3735">[email&#160;protected]</a></p>
+                <p th:if="${user.email != null and !user.email.isEmpty()}" th:text="${user.email}">email@example.com</p>
                 <p th:text="'登録日: ' + ${#temporals.format(user.createdAt, 'yyyy年MM月dd日')}">登録日: 2024年01月01日</p>
             </div>
         </div>
@@ -638,7 +429,7 @@ body {
         </div>
         
         <div class="bio-section" th:if="${user.bio == null or user.bio.isEmpty()}">
-            <div class="bio-empty">まだ自己紹介が設定されていません</div>
+            <div class="bio-empty">自己紹介が設定されていません</div>
         </div>
 
         <div class="stats">
@@ -655,11 +446,10 @@ body {
 
     <!-- 投稿タブ -->
     <div id="posts-tab" class="tab-content active">
-        <h2 class="section-title">あなたの投稿</h2>
+        <h2 class="section-title">投稿</h2>
 
         <div th:if="${userPosts.isEmpty()}" class="empty-state">
             <p>まだ投稿がありません</p>
-            <p><a href="/">トップページ</a>から投稿してみましょう!</p>
         </div>
 
         <div th:unless="${userPosts.isEmpty()}">
@@ -668,12 +458,6 @@ body {
                     <div class="post-meta">
                         <span class="timestamp" th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
                     </div>
-                    
-                    <form action="/post/delete" method="post" style="display: inline;" 
-                          onsubmit="return confirm('本当に削除しますか?');">
-                        <input type="hidden" name="postId" th:value="${post.id}">
-                        <button type="submit" class="delete-btn">削除</button>
-                    </form>
                 </div>
                 
                 <div class="post-content" th:utext="${post.content}">投稿内容</div>
@@ -683,7 +467,7 @@ body {
 
     <!-- 返信タブ -->
     <div id="replies-tab" class="tab-content">
-        <h2 class="section-title">あなたの返信</h2>
+        <h2 class="section-title">返信</h2>
 
         <div th:if="${userReplies == null or userReplies.isEmpty()}" class="empty-state">
             <p>まだ返信がありません</p>
@@ -698,12 +482,6 @@ body {
                             → <strong th:text="${reply.parent.username}">ユーザー名</strong>への返信
                         </span>
                     </div>
-                    
-                    <form action="/post/delete" method="post" style="display: inline;" 
-                          onsubmit="return confirm('本当に削除しますか?');">
-                        <input type="hidden" name="postId" th:value="${reply.id}">
-                        <button type="submit" class="delete-btn">削除</button>
-                    </form>
                 </div>
                 
                 <div class="post-content" th:utext="${reply.content}">返信内容</div>
@@ -717,67 +495,7 @@ body {
     </div>
 </div>
 
-<!-- 設定モーダル -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>設定</h3>
-            <button class="modal-close" onclick="closeSettings()">&times;</button>
-        </div>
-
-        <!-- データ管理 -->
-        <div class="settings-section">
-            <h4>データ管理</h4>
-            
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-title">投稿を全て削除</div>
-                    <div class="settings-item-desc">あなたの全ての投稿を削除します（返信は残ります）</div>
-                </div>
-                <form action="/mypage/delete-all-posts" method="post" style="display: inline;" 
-                      onsubmit="return confirm('全ての投稿を削除しますか？この操作は取り消せません。');">
-                    <button type="submit" class="btn-modal btn-modal-danger">削除</button>
-                </form>
-            </div>
-
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-title">返信を全て削除</div>
-                    <div class="settings-item-desc">あなたの全ての返信を削除します（投稿は残ります）</div>
-                </div>
-                <form action="/mypage/delete-all-replies" method="post" style="display: inline;" 
-                      onsubmit="return confirm('全ての返信を削除しますか？この操作は取り消せません。');">
-                    <button type="submit" class="btn-modal btn-modal-danger">削除</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- アカウント -->
-        <div class="settings-section">
-            <h4>アカウント</h4>
-            
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-title">ログアウト</div>
-                    <div class="settings-item-desc">このアカウントからログアウトします</div>
-                </div>
-                <form action="/logout" method="post" style="display: inline;">
-                     <button type="submit" class="btn-modal btn-modal-danger">ログアウト</button>
-                </form>
-            </div>
-
-            <div class="settings-item">
-                <div class="settings-item-info">
-                    <div class="settings-item-title">アカウント削除</div>
-                    <div class="settings-item-desc">アカウントと全てのデータを完全に削除します</div>
-                </div>
-                <a href="/mypage/delete-confirm" class="btn-modal btn-modal-danger" style="text-decoration: none;">削除</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 function showTab(tabName) {
     const postsTab = document.getElementById('posts-tab');
     const repliesTab = document.getElementById('replies-tab');
@@ -797,21 +515,6 @@ function showTab(tabName) {
         repliesStat.classList.add('active');
     }
 }
-
-function openSettings() {
-    document.getElementById('settingsModal').classList.add('active');
-}
-
-function closeSettings() {
-    document.getElementById('settingsModal').classList.remove('active');
-}
-
-// モーダル外をクリックで閉じる
-document.getElementById('settingsModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeSettings();
-    }
-});
 </script>
 
 </body>

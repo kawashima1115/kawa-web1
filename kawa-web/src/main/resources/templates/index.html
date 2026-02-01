@@ -291,6 +291,19 @@
         align-items: center;
         gap: 12px;
     }
+
+    .post-header-left a {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+    }
+
+    .post-header-left a:hover strong {
+        color: #2e7d32;
+    }
     
     .user-avatar {
         width: 40px;
@@ -316,6 +329,7 @@
     .post-header strong {
         color: #495057;
         font-weight: 600;
+        cursor: pointer;
     }
     
     .user-id {
@@ -560,18 +574,20 @@
         <!-- 投稿ヘッダー -->
         <div class="post-header">
             <div class="post-header-left">
-                <div class="user-avatar" th:if="${post.user.iconPath != null}">
-                    <img th:src="@{'/uploads/icons/' + ${post.user.iconPath}}" alt="アイコン">
-                </div>
-                <div class="user-avatar" th:if="${post.user.iconPath == null}" 
-                     th:text="${#strings.substring(post.username, 0, 1).toUpperCase()}">U</div>
-                <div>
-                    <strong th:text="${post.username}">ユーザー名</strong>
-                    <div class="user-id">
-                        <span th:text="'@' + ${post.user.userId}">@user_id</span>
-                        <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                <a th:href="@{'/user/' + ${post.user.userId}}">
+                    <div class="user-avatar" th:if="${post.user.iconPath != null}">
+                        <img th:src="@{'/uploads/icons/' + ${post.user.iconPath}}" alt="アイコン">
                     </div>
-                </div>
+                    <div class="user-avatar" th:if="${post.user.iconPath == null}" 
+                         th:text="${#strings.substring(post.username, 0, 1).toUpperCase()}">U</div>
+                    <div>
+                        <strong th:text="${post.username}">ユーザー名</strong>
+                        <div class="user-id">
+                            <span th:text="'@' + ${post.user.userId}">@user_id</span>
+                            <span class="timestamp" th:text="${#temporals.format(post.createdAt,'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
         
@@ -622,18 +638,20 @@
             <div th:each="reply : ${post.replies}" class="reply-item">
                 <div class="post-header">
                     <div class="post-header-left">
-                        <div class="user-avatar" th:if="${reply.user.iconPath != null}">
-                            <img th:src="@{'/uploads/icons/' + ${reply.user.iconPath}}" alt="アイコン">
-                        </div>
-                        <div class="user-avatar" th:if="${reply.user.iconPath == null}" 
-                             th:text="${#strings.substring(reply.username, 0, 1).toUpperCase()}">U</div>
-                        <div>
-                            <strong th:text="${reply.username}">ユーザー名</strong>
-                            <div class="user-id">
-                                <span th:text="'@' + ${reply.user.userId}">@user_id</span>
-                                <span class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                        <a th:href="@{'/user/' + ${reply.user.userId}}">
+                            <div class="user-avatar" th:if="${reply.user.iconPath != null}">
+                                <img th:src="@{'/uploads/icons/' + ${reply.user.iconPath}}" alt="アイコン">
                             </div>
-                        </div>
+                            <div class="user-avatar" th:if="${reply.user.iconPath == null}" 
+                                 th:text="${#strings.substring(reply.username, 0, 1).toUpperCase()}">U</div>
+                            <div>
+                                <strong th:text="${reply.username}">ユーザー名</strong>
+                                <div class="user-id">
+                                    <span th:text="'@' + ${reply.user.userId}">@user_id</span>
+                                    <span class="timestamp" th:text="${#temporals.format(reply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 
@@ -683,18 +701,20 @@
                     <div th:each="nestedReply : ${reply.replies}" class="reply-item">
                         <div class="post-header">
                             <div class="post-header-left">
-                                <div class="user-avatar" th:if="${nestedReply.user.iconPath != null}">
-                                    <img th:src="@{'/uploads/icons/' + ${nestedReply.user.iconPath}}" alt="アイコン">
-                                </div>
-                                <div class="user-avatar" th:if="${nestedReply.user.iconPath == null}" 
-                                     th:text="${#strings.substring(nestedReply.username, 0, 1).toUpperCase()}">U</div>
-                                <div>
-                                    <strong th:text="${nestedReply.username}">ユーザー名</strong>
-                                    <div class="user-id">
-                                        <span th:text="'@' + ${nestedReply.user.userId}">@user_id</span>
-                                        <span class="timestamp" th:text="${#temporals.format(nestedReply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                                <a th:href="@{'/user/' + ${nestedReply.user.userId}}">
+                                    <div class="user-avatar" th:if="${nestedReply.user.iconPath != null}">
+                                        <img th:src="@{'/uploads/icons/' + ${nestedReply.user.iconPath}}" alt="アイコン">
                                     </div>
-                                </div>
+                                    <div class="user-avatar" th:if="${nestedReply.user.iconPath == null}" 
+                                         th:text="${#strings.substring(nestedReply.username, 0, 1).toUpperCase()}">U</div>
+                                    <div>
+                                        <strong th:text="${nestedReply.username}">ユーザー名</strong>
+                                        <div class="user-id">
+                                            <span th:text="'@' + ${nestedReply.user.userId}">@user_id</span>
+                                            <span class="timestamp" th:text="${#temporals.format(nestedReply.createdAt, 'yyyy/MM/dd HH:mm')}">2024/01/01 12:00</span>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                         

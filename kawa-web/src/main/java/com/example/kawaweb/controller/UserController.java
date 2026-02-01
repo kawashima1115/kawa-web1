@@ -1,7 +1,9 @@
 package com.example.kawaweb.controller;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -9,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.kawaweb.model.Post;
 import com.example.kawaweb.model.User;
+import com.example.kawaweb.repository.PostRepository;
 import com.example.kawaweb.repository.UserRepository;
 
 @Controller
@@ -21,6 +26,9 @@ public class UserController {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PostRepository postRepository;
     
     // ユーザーIDの正規表現パターン（アルファベット、数字、_、.のみ）
     private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_.]+$");
@@ -133,6 +141,60 @@ public class UserController {
         session.removeAttribute("loggedInUser");
         redirectAttributes.addFlashAttribute("success", "ログアウトしました");
         return "redirect:/";
+    }
+    
+    // ユーザープロフィール閲覧
+    @GetMapping("/user/{userId}")
+    public String viewProfile(@PathVariable String userId,
+                             HttpSession session,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
+        
+        // ユーザーIDで検索
+        Optional<User> userOpt = userRepository.findByUserId(userId);
+        
+        if (userOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーが見つかりませんでした");
+            return "redirect:/";
+        }
+        
+        User user = userOpt.get();
+        User loggedInUser = getLoggedInUser(session);
+        
+        // 自分のプロフィールの場合はマイページにリダイレクト
+        if (loggedInUser != null && loggedInUser.getId().equals(user.getId())) {
+            return "redirect:/mypage";
+        }
+        
+        // ユーザーの投稿を取得
+        List<Post> allPosts = postRepository.findByUserOrderByCreatedAtDesc(user);
+        
+        // 親投稿と返信を分離
+        List<Post> userPosts = allPosts.stream()
+                .filter(post -> post.getParent() == null)
+                .collect(Collectors.toList());
+        
+        List<Post> userReplies = allPosts.stream()
+                .filter(post -> post.getParent() != null)
+                .collect(Collectors.toList());
+        
+        // 利用日数を計算
+        long daysSinceRegistration = java.time.temporal.ChronoUnit.DAYS.between(
+            user.getCreatedAt().toLocalDate(),
+            java.time.LocalDate.now()
+        );
+        
+        model.addAttribute("user", user);
+        model.addAttribute("userPosts", userPosts);
+        model.addAttribute("userReplies", userReplies);
+        model.addAttribute("postCount", userPosts.size());
+        model.addAttribute("replyCount", userReplies.size());
+        model.addAttribute("totalCount", allPosts.size());
+        model.addAttribute("daysSinceRegistration", daysSinceRegistration);
+        model.addAttribute("loggedInUser", loggedInUser);
+        model.addAttribute("isLoggedIn", isLoggedIn(session));
+        
+        return "user-profile";
     }
     
     // ログイン状態チェックのヘルパーメソッド
