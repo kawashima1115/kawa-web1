@@ -216,8 +216,8 @@ button:disabled {
             <label for="username">ユーザー名 <span class="required">*</span></label>
             <input type="text" id="username" name="username" required
                 placeholder="ユーザー名を入力してください"
-                minlength="6">
-            <div class="form-note">6文字以上で入力してください</div>
+                minlength="3">
+            <div class="form-note">3文字以上で入力してください</div>
         </div>
 
         <div class="form-group">
@@ -225,10 +225,10 @@ button:disabled {
             <input type="text" id="userId" name="userId" required
                 placeholder="user_id123"
                 pattern="[a-zA-Z0-9_.]+"
-                minlength="3"
+                minlength="6"
                 maxlength="20">
             <div class="form-note" id="userIdNote">
-                3～20文字。アルファベット、数字、_、.のみ使用可能
+                6～20文字。アルファベット、数字、_、.のみ使用可能
             </div>
         </div>
 
@@ -270,7 +270,7 @@ userIdInput.addEventListener('input', function() {
     if (value === '') {
         this.classList.remove('error', 'success');
         userIdNote.classList.remove('error', 'success');
-        userIdNote.textContent = '3～20文字。アルファベット、数字、_、.のみ使用可能';
+        userIdNote.textContent = '6～20文字。アルファベット、数字、_、.のみ使用可能';
         return;
     }
     
@@ -285,12 +285,12 @@ userIdInput.addEventListener('input', function() {
     }
     
     // 長さチェック
-    if (value.length < 3) {
+    if (value.length < 6) {
         this.classList.add('error');
         this.classList.remove('success');
         userIdNote.classList.add('error');
         userIdNote.classList.remove('success');
-        userIdNote.textContent = 'あと' + (3 - value.length) + '文字必要です';
+        userIdNote.textContent = 'あと' + (6 - value.length) + '文字必要です';
         return;
     }
     
@@ -322,9 +322,9 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         return false;
     }
     
-    if (userId.length < 3 || userId.length > 20) {
+    if (userId.length < 6 || userId.length > 20) {
         e.preventDefault();
-        alert('ユーザーIDは3文字以上20文字以内で入力してください');
+        alert('ユーザーIDは6文字以上20文字以内で入力してください');
         return false;
     }
 });

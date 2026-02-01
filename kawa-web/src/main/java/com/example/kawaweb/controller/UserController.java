@@ -46,9 +46,9 @@ public class UserController {
             return "redirect:/register";
         }
         
-        // ユーザー名の長さチェック（6文字以上に変更）
-        if (username.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "ユーザー名は6文字以上で入力してください");
+        // ユーザー名の長さチェック（3文字以上）
+        if (username.length() < 3) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名は3文字以上で入力してください");
             return "redirect:/register";
         }
         
@@ -59,8 +59,8 @@ public class UserController {
         }
         
         // ユーザーIDの長さチェック
-        if (userId.length() < 3 || userId.length() > 20) {
-            redirectAttributes.addFlashAttribute("error", "ユーザーIDは3文字以上20文字以内で入力してください");
+        if (userId.length() < 6 || userId.length() > 20) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDは6文字以上20文字以内で入力してください");
             return "redirect:/register";
         }
         
