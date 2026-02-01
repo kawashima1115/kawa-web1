@@ -177,10 +177,9 @@ body {
 
 .bio-section {
     margin-top: 20px;
-    padding: 16px;
+    padding: 12px 16px;
     background: white;
     border-radius: 6px;
-    border-left: 3px solid #2e7d32;
 }
 
 .bio-label {
@@ -194,8 +193,8 @@ body {
 
 .bio-text {
     color: #495057;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
@@ -203,7 +202,7 @@ body {
 .bio-empty {
     color: #adb5bd;
     font-style: italic;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .stats {
@@ -215,7 +214,7 @@ body {
 
 .stat-item {
     background: white;
-    padding: 20px;
+    padding: 10px;
     border-radius: 6px;
     text-align: center;
     transition: all 0.3s ease;
@@ -241,14 +240,14 @@ body {
 }
 
 .stat-value {
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 700;
     color: #2e7d32;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 .stat-label {
-    font-size: 13px;
+    font-size: 11px;
     color: #6c757d;
     font-weight: 600;
 }
@@ -635,12 +634,10 @@ body {
 
         <!-- 自己紹介セクション -->
         <div class="bio-section" th:if="${user.bio != null and !user.bio.isEmpty()}">
-            <div class="bio-label">自己紹介</div>
             <div class="bio-text" th:text="${user.bio}">自己紹介文が表示されます</div>
         </div>
         
         <div class="bio-section" th:if="${user.bio == null or user.bio.isEmpty()}">
-            <div class="bio-label">自己紹介</div>
             <div class="bio-empty">まだ自己紹介が設定されていません</div>
         </div>
 
