@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpSession;
@@ -37,6 +38,9 @@ public class MyPageController {
     
     // アップロードされた画像を保存するディレクトリ
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads/icons/";
+    
+    // ユーザーIDの正規表現パターン
+    private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_.]+$");
     
     // マイページ表示
     @GetMapping("/mypage")
@@ -144,12 +148,12 @@ public class MyPageController {
         return "mypage-edit";
     }
     
-    // プロフィール更新
-    @PostMapping("/mypage/update")
-    public String updateProfile(
-            @RequestParam(required = false) String currentPassword,
-            @RequestParam(required = false) String newPassword,
-            @RequestParam(required = false) MultipartFile iconFile,
+    // 基本情報更新（ユーザー名・ユーザーID・自己紹介）
+    @PostMapping("/mypage/update-profile")
+    public String updateBasicProfile(
+            @RequestParam String username,
+            @RequestParam String userId,
+            @RequestParam(required = false) String bio,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         
@@ -169,77 +173,200 @@ public class MyPageController {
         User user = userOpt.get();
         boolean updated = false;
         
-        // アイコン画像の処理
-        if (iconFile != null && !iconFile.isEmpty()) {
-            try {
-                // アップロードディレクトリを作成
-                Path uploadPath = Paths.get(UPLOAD_DIR);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-                
-                // ファイル名をユニークにする
-                String originalFilename = iconFile.getOriginalFilename();
-                String extension = "";
-                if (originalFilename != null && originalFilename.contains(".")) {
-                    extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                }
-                String filename = UUID.randomUUID().toString() + extension;
-                
-                // ファイルを保存
-                Path filePath = uploadPath.resolve(filename);
-                Files.write(filePath, iconFile.getBytes());
-                
-                // 古いアイコンファイルを削除（デフォルトアイコンでない場合）
-                if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
-                    try {
-                        Path oldFile = Paths.get(UPLOAD_DIR + user.getIconPath());
-                        Files.deleteIfExists(oldFile);
-                    } catch (IOException e) {
-                        System.out.println("古いアイコンの削除に失敗: " + e.getMessage());
-                    }
-                }
-                
-                // データベースに保存するのはファイル名のみ
-                user.setIconPath(filename);
-                updated = true;
-                
-                System.out.println("アイコンアップロード成功: " + filename);
-            } catch (IOException e) {
-                System.out.println("アイコンアップロードエラー: " + e.getMessage());
-                e.printStackTrace();
-                redirectAttributes.addFlashAttribute("error", "アイコンのアップロードに失敗しました");
-                return "redirect:/mypage/edit";
-            }
+        // ユーザー名のバリデーション
+        if (username == null || username.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名を入力してください");
+            return "redirect:/mypage/edit";
         }
         
-        // パスワード更新
-        if (currentPassword != null && !currentPassword.isEmpty() && 
-            newPassword != null && !newPassword.isEmpty()) {
-            
-            if (!user.getPassword().equals(currentPassword)) {
-                redirectAttributes.addFlashAttribute("error", "現在のパスワードが間違っています");
+        if (username.length() < 3) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名は3文字以上で入力してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        // ユーザーIDのバリデーション
+        if (userId == null || userId.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDを入力してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        if (userId.length() < 6 || userId.length() > 20) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDは6文字以上20文字以内で入力してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        if (!USER_ID_PATTERN.matcher(userId).matches()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDはアルファベット、数字、_、.のみ使用できます");
+            return "redirect:/mypage/edit";
+        }
+        
+        // 自己紹介のバリデーション
+        if (bio != null && bio.length() > 500) {
+            redirectAttributes.addFlashAttribute("error", "自己紹介は500文字以内で入力してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        // ユーザー名の変更チェック
+        if (!username.equals(user.getUsername())) {
+            // 他のユーザーが使用していないかチェック
+            if (userRepository.existsByUsername(username)) {
+                redirectAttributes.addFlashAttribute("error", "そのユーザー名は既に使用されています");
                 return "redirect:/mypage/edit";
             }
-            
-            if (newPassword.length() < 8) {
-                redirectAttributes.addFlashAttribute("error", "新しいパスワードは8文字以上で設定してください");
+            user.setUsername(username);
+            updated = true;
+        }
+        
+        // ユーザーIDの変更チェック
+        if (!userId.equals(user.getUserId())) {
+            // 他のユーザーが使用していないかチェック
+            Optional<User> existingUser = userRepository.findByUserId(userId);
+            if (existingUser.isPresent() && !existingUser.get().getId().equals(user.getId())) {
+                redirectAttributes.addFlashAttribute("error", "そのユーザーIDは既に使用されています");
                 return "redirect:/mypage/edit";
             }
-            
-            user.setPassword(newPassword);
+            user.setUserId(userId);
+            updated = true;
+        }
+        
+        // 自己紹介の変更チェック
+        String currentBio = user.getBio() == null ? "" : user.getBio();
+        String newBio = bio == null ? "" : bio.trim();
+        
+        if (!currentBio.equals(newBio)) {
+            user.setBio(newBio.isEmpty() ? null : newBio);
             updated = true;
         }
         
         if (updated) {
             userRepository.save(user);
             session.setAttribute("loggedInUser", user);
-            redirectAttributes.addFlashAttribute("success", "プロフィールを更新しました");
+            redirectAttributes.addFlashAttribute("success", "基本情報を更新しました");
         } else {
             redirectAttributes.addFlashAttribute("info", "変更内容がありませんでした");
         }
         
-        return "redirect:/mypage";
+        return "redirect:/mypage/edit";
+    }
+    
+    // アイコン更新
+    @PostMapping("/mypage/update-icon")
+    public String updateIcon(
+            @RequestParam MultipartFile iconFile,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        Optional<User> userOpt = userRepository.findById(loggedInUser.getId());
+        if (userOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー情報が見つかりません");
+            return "redirect:/";
+        }
+        
+        User user = userOpt.get();
+        
+        if (iconFile == null || iconFile.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "画像ファイルを選択してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        try {
+            // アップロードディレクトリを作成
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            
+            // ファイル名をユニークにする
+            String originalFilename = iconFile.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String filename = UUID.randomUUID().toString() + extension;
+            
+            // ファイルを保存
+            Path filePath = uploadPath.resolve(filename);
+            Files.write(filePath, iconFile.getBytes());
+            
+            // 古いアイコンファイルを削除
+            if (user.getIconPath() != null && !user.getIconPath().isEmpty()) {
+                try {
+                    Path oldFile = Paths.get(UPLOAD_DIR + user.getIconPath());
+                    Files.deleteIfExists(oldFile);
+                } catch (IOException e) {
+                    System.out.println("古いアイコンの削除に失敗: " + e.getMessage());
+                }
+            }
+            
+            user.setIconPath(filename);
+            userRepository.save(user);
+            session.setAttribute("loggedInUser", user);
+            
+            redirectAttributes.addFlashAttribute("success", "アイコンを変更しました");
+        } catch (IOException e) {
+            System.out.println("アイコンアップロードエラー: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "アイコンのアップロードに失敗しました");
+        }
+        
+        return "redirect:/mypage/edit";
+    }
+    
+    // パスワード更新
+    @PostMapping("/mypage/update-password")
+    public String updatePassword(
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        
+        if (loggedInUser == null) {
+            redirectAttributes.addFlashAttribute("error", "ログインが必要です");
+            return "redirect:/login";
+        }
+        
+        Optional<User> userOpt = userRepository.findById(loggedInUser.getId());
+        if (userOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー情報が見つかりません");
+            return "redirect:/";
+        }
+        
+        User user = userOpt.get();
+        
+        // 現在のパスワードチェック
+        if (!user.getPassword().equals(currentPassword)) {
+            redirectAttributes.addFlashAttribute("error", "現在のパスワードが間違っています");
+            return "redirect:/mypage/edit";
+        }
+        
+        // 新しいパスワードのバリデーション
+        if (newPassword.length() < 8) {
+            redirectAttributes.addFlashAttribute("error", "新しいパスワードは8文字以上で設定してください");
+            return "redirect:/mypage/edit";
+        }
+        
+        // パスワード確認チェック
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "新しいパスワードと確認用パスワードが一致しません");
+            return "redirect:/mypage/edit";
+        }
+        
+        user.setPassword(newPassword);
+        userRepository.save(user);
+        session.setAttribute("loggedInUser", user);
+        
+        redirectAttributes.addFlashAttribute("success", "パスワードを変更しました");
+        return "redirect:/mypage/edit";
     }
     
     // アイコン削除

@@ -5,24 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>プロフィール編集 - kawa-web</title>
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f5f5;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    min-height: 100vh;
 }
 
 .container {
-    max-width: 700px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 30px;
     background: white;
-    border-radius: 8px;
+    min-height: calc(100vh - 60px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -31,60 +27,38 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    padding-bottom: 20px;
+    padding: 20px 0;
     border-bottom: 2px solid #e1e5e9;
 }
 
 .header h1 {
     font-size: 28px;
+    font-weight: 700;
     color: #2e7d32;
+    letter-spacing: -0.5px;
 }
 
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #2e7d32;
-    color: white;
-    text-decoration: none;
+.btn-back {
+    background: rgba(46, 125, 50, 0.1);
+    color: #2e7d32;
+    padding: 8px 16px;
     border-radius: 6px;
     font-weight: 600;
-    transition: background 0.3s;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
     font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-.btn:hover {
-    background: #1b5e20;
-}
-
-.btn-secondary {
-    background: #6c757d;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
-}
-
-.btn-danger {
-    background: #dc3545;
-}
-
-.btn-danger:hover {
-    background: #c82333;
+.btn-back:hover {
+    background: rgba(46, 125, 50, 0.15);
+    transform: translateY(-1px);
 }
 
 .alert {
-    padding: 15px;
-    margin-bottom: 20px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
     border-radius: 6px;
-}
-
-.alert-success {
-    background: rgba(40, 167, 69, 0.1);
-    color: #155724;
-    border-left: 4px solid #28a745;
+    font-weight: 500;
 }
 
 .alert-error {
@@ -93,107 +67,113 @@ body {
     border-left: 4px solid #dc3545;
 }
 
+.alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
 .alert-info {
     background: rgba(13, 202, 240, 0.1);
     color: #055160;
     border-left: 4px solid #0dcaf0;
 }
 
-.form-section {
-    margin-bottom: 30px;
+.section {
+    background: rgba(46, 125, 50, 0.05);
     padding: 25px;
-    background: #f8f9fa;
     border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(46, 125, 50, 0.15);
 }
 
-.form-section h2 {
-    font-size: 18px;
+.section h3 {
+    margin-top: 0;
     color: #495057;
+    font-weight: 600;
+    font-size: 18px;
     margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #dee2e6;
 }
 
 .form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+label {
     display: block;
     margin-bottom: 8px;
-    color: #495057;
     font-weight: 600;
+    color: #495057;
     font-size: 14px;
 }
 
-.form-group input {
+input[type="text"],
+input[type="password"],
+input[type="file"],
+textarea {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ced4da;
+    border: 2px solid #e1e5e9;
     border-radius: 6px;
     font-size: 14px;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: all 0.3s ease;
 }
 
-.form-group input:focus {
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus {
     outline: none;
     border-color: #2e7d32;
     box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
-.form-group input:disabled {
-    background: #e9ecef;
-    cursor: not-allowed;
+input.error,
+textarea.error {
+    border-color: #dc3545;
 }
 
-.form-help {
+input.success,
+textarea.success {
+    border-color: #28a745;
+}
+
+.form-note {
     font-size: 12px;
     color: #6c757d;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
-.form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 25px;
+.form-note.error {
+    color: #dc3545;
 }
 
-.form-actions button,
-.form-actions a {
-    flex: 1;
-    text-align: center;
+.form-note.success {
+    color: #28a745;
 }
 
-.current-info {
-    background: rgba(46, 125, 50, 0.05);
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-size: 14px;
+.char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
 }
 
-.current-info strong {
-    color: #2e7d32;
+.char-counter.warning {
+    color: #ff9800;
 }
 
-.warning-box {
-    background: rgba(255, 193, 7, 0.1);
-    border-left: 4px solid #ffc107;
-    padding: 15px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: #856404;
+.char-counter.error {
+    color: #dc3545;
 }
 
-/* アイコンプレビュー */
-.icon-preview-container {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.icon-preview {
+.current-icon {
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -204,223 +184,259 @@ body {
     font-size: 48px;
     font-weight: 700;
     color: white;
+    margin-bottom: 15px;
     overflow: hidden;
-    flex-shrink: 0;
 }
 
-.icon-preview img {
+.current-icon img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.icon-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
 }
 
-.file-input-label {
-    display: inline-block;
-    padding: 8px 16px;
+.btn-primary {
     background: #2e7d32;
     color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.3s ease;
-    text-align: center;
+    width: 100%;
 }
 
-.file-input-label:hover {
+.btn-primary:hover {
     background: #1b5e20;
+    transform: translateY(-1px);
 }
 
-.file-input-label input {
-    display: none;
+.btn-danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
 }
 
-.selected-file {
-    font-size: 12px;
-    color: #495057;
-    margin-top: 5px;
+.btn-danger:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-1px);
 }
 
-.btn-small {
-    padding: 6px 12px;
-    font-size: 13px;
+.icon-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.required {
+    color: #dc3545;
 }
 </style>
 </head>
 <body>
 <div class="container">
-    <!-- ヘッダー -->
     <div class="header">
         <h1>プロフィール編集</h1>
-        <a href="/mypage" class="btn btn-secondary">戻る</a>
+        <a href="/mypage" class="btn-back">← マイページ</a>
     </div>
 
-    <!-- メッセージ表示 -->
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
+	
+	<!-- アイコン変更 -->
+	<div class="section">
+	    <h3>プロフィールアイコン</h3>
+	    
+	    <div class="current-icon">
+	        <img th:if="${user.iconPath != null}" 
+	             th:src="@{'/uploads/icons/' + ${user.iconPath}}" 
+	             alt="現在のアイコン">
+	        <span th:if="${user.iconPath == null}" 
+	              th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</span>
+	    </div>
 
-    <!-- 現在の情報表示 -->
-    <div class="current-info">
-        <p><strong>現在のユーザー名:</strong> <span th:text="${user.username}">username</span></p>
+	    <form action="/mypage/update-icon" method="post" enctype="multipart/form-data">
+	        <div class="form-group">
+	            <label for="iconFile">新しいアイコン画像</label>
+	            <input type="file" id="iconFile" name="iconFile" accept="image/*">
+	            <div class="form-note">画像ファイル（JPG, PNG, GIF）を選択してください</div>
+	        </div>
+	        
+	        <div class="icon-actions">
+	            <button type="submit" class="btn btn-primary" style="flex: 1;">アイコンを変更</button>
+	            <button type="button" class="btn btn-danger" 
+	                    th:if="${user.iconPath != null}"
+	                    onclick="if(confirm('アイコンを削除しますか？')) { document.getElementById('deleteIconForm').submit(); }">
+	                削除
+	            </button>
+	        </div>
+	    </form>
+
+	    <form id="deleteIconForm" action="/mypage/delete-icon" method="post" style="display: none;"></form>
+	</div>
+
+
+    <!-- 基本情報変更 -->
+    <div class="section">
+        <h3>基本情報</h3>
+        <form action="/mypage/update-profile" method="post">
+            <div class="form-group">
+                <label for="username">ユーザー名 <span class="required">*</span></label>
+                <input type="text" id="username" name="username" 
+                       th:value="${user.username}" 
+                       required
+                       minlength="3"
+                       placeholder="新しいユーザー名">
+                <div class="form-note">3文字以上で入力してください</div>
+            </div>
+
+            <div class="form-group">
+                <label for="userId">ユーザーID <span class="required">*</span></label>
+                <input type="text" id="userId" name="userId" 
+                       th:value="${user.userId}" 
+                       required
+                       pattern="[a-zA-Z0-9_.]+"
+                       minlength="6"
+                       maxlength="20"
+                       placeholder="新しいユーザーID">
+                <div class="form-note" id="userIdNote">
+                    6～20文字。アルファベット、数字、_、.のみ使用可能
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">自己紹介</label>
+                <textarea id="bio" name="bio" 
+                          maxlength="500"
+                          placeholder="自己紹介を入力してください（500文字以内）"
+                          th:text="${user.bio}"></textarea>
+                <div class="char-counter" id="bioCounter">
+                    <span id="bioCount">0</span> / 500文字
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">基本情報を更新</button>
+        </form>
     </div>
 
-    <form action="/mypage/update" method="post" enctype="multipart/form-data" autocomplete="off">
-        <!-- アイコン設定セクション -->
-        <div class="form-section">
-            <h2>プロフィールアイコン</h2>
-            
-            <div class="icon-preview-container">
-                <div class="icon-preview" id="iconPreview">
-                    <img th:if="${user.iconPath != null}" 
-                         th:src="@{'/uploads/icons/' + ${user.iconPath}}" 
-                         alt="現在のアイコン">
-                    <span th:if="${user.iconPath == null}" 
-                          th:text="${#strings.substring(user.username, 0, 1).toUpperCase()}">U</span>
-                </div>
-                
-                <div class="icon-actions">
-                    <label class="file-input-label">
-                        アイコンを選択
-                        <input type="file" name="iconFile" id="iconFile" accept="image/*" onchange="previewIcon(event)">
-                    </label>
-                    <div id="selectedFile" class="selected-file"></div>
-                    
-                    <button th:if="${user.iconPath != null}" 
-                            type="button" 
-                            class="btn btn-danger btn-small"
-                            onclick="deleteIcon()">
-                        アイコンを削除
-                    </button>
-                </div>
-            </div>
-            
-            <div class="form-help">
-                推奨: 正方形の画像 (JPG, PNG, GIF形式)
-            </div>
-        </div>
-        
-        <!-- 基本情報セクション -->
-        <div class="form-section">
-            <h2>基本情報</h2>
-            
-            <div class="form-group">
-                <label for="username">ユーザー名</label>
-                <input type="text" id="username" name="username" 
-                       th:value="${user.username}" disabled>
-                <div class="form-help">※ユーザー名は変更できません</div>
-            </div>
-        </div>
 
-        <!-- パスワード変更セクション -->
-        <div class="form-section">
-            <h2>パスワード変更</h2>
-            
-            <div class="warning-box">
-                パスワードを変更する場合のみ、以下の欄に入力してください。変更しない場合は空欄のままにしてください。
+    <!-- パスワード変更 -->
+    <div class="section">
+        <h3>パスワード変更</h3>
+        <form action="/mypage/update-password" method="post">
+            <div class="form-group">
+                <label for="currentPassword">現在のパスワード <span class="required">*</span></label>
+                <input type="password" id="currentPassword" name="currentPassword" required>
             </div>
 
             <div class="form-group">
-                <label for="currentPassword">現在のパスワード</label>
-                <input type="password" id="currentPassword" name="currentPassword" 
-                       placeholder="現在のパスワードを入力"
-                       autocomplete="new-password">
+                <label for="newPassword">新しいパスワード <span class="required">*</span></label>
+                <input type="password" id="newPassword" name="newPassword" required minlength="8">
+                <div class="form-note">8文字以上で入力してください</div>
             </div>
 
             <div class="form-group">
-                <label for="newPassword">新しいパスワード</label>
-                <input type="password" id="newPassword" name="newPassword" 
-                       placeholder="新しいパスワード（8文字以上）"
-                       autocomplete="new-password">
-                <div class="form-help">8文字以上で設定してください</div>
+                <label for="confirmPassword">新しいパスワード（確認） <span class="required">*</span></label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
             </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">新しいパスワード（確認）</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" 
-                       placeholder="もう一度入力してください"
-                       autocomplete="new-password">
-            </div>
-        </div>
-
-        <!-- 送信ボタン -->
-        <div class="form-actions">
-            <a href="/mypage" class="btn btn-secondary">キャンセル</a>
-            <button type="submit" class="btn">変更を保存</button>
-        </div>
-    </form>
+            <button type="submit" class="btn btn-primary">パスワードを変更</button>
+        </form>
+    </div>
 </div>
 
 <script>
-// アイコン削除関数
-function deleteIcon() {
-    if (confirm('アイコンを削除しますか？')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/mypage/delete-icon';
-        document.body.appendChild(form);
-        form.submit();
+// 自己紹介文字数カウンター
+const bioTextarea = document.getElementById('bio');
+const bioCount = document.getElementById('bioCount');
+const bioCounter = document.getElementById('bioCounter');
+
+function updateBioCounter() {
+    const length = bioTextarea.value.length;
+    bioCount.textContent = length;
+    
+    bioCounter.classList.remove('warning', 'error');
+    
+    if (length > 500) {
+        bioCounter.classList.add('error');
+    } else if (length > 450) {
+        bioCounter.classList.add('warning');
     }
 }
 
-// アイコンプレビュー機能
-function previewIcon(event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById('iconPreview');
-    const selectedFile = document.getElementById('selectedFile');
+bioTextarea.addEventListener('input', updateBioCounter);
+// 初期表示時にもカウント
+updateBioCounter();
+
+// ユーザーIDのリアルタイムバリデーション
+const userIdInput = document.getElementById('userId');
+const userIdNote = document.getElementById('userIdNote');
+
+userIdInput.addEventListener('input', function() {
+    const value = this.value;
+    const pattern = /^[a-zA-Z0-9_.]+$/;
     
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.innerHTML = '<img src="' + e.target.result + '" alt="プレビュー">';
-        };
-        reader.readAsDataURL(file);
-        selectedFile.textContent = '選択: ' + file.name;
+    if (value === '') {
+        this.classList.remove('error', 'success');
+        userIdNote.classList.remove('error', 'success');
+        userIdNote.textContent = '6～20文字。アルファベット、数字、_、.のみ使用可能';
+        return;
     }
-}
+    
+    if (!pattern.test(value)) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = '使用できない文字が含まれています';
+        return;
+    }
+    
+    if (value.length < 6) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = 'あと' + (6 - value.length) + '文字必要です';
+        return;
+    }
+    
+    if (value.length > 20) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = '20文字以内で入力してください';
+        return;
+    }
+    
+    this.classList.remove('error');
+    this.classList.add('success');
+    userIdNote.classList.remove('error');
+    userIdNote.classList.add('success');
+    userIdNote.textContent = '✓ 使用可能な形式です';
+});
 
 // パスワード確認のバリデーション
-document.querySelector('form').addEventListener('submit', function(e) {
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const currentPassword = document.getElementById('currentPassword').value;
-    
-    // パスワード変更を試みている場合のみバリデーション
-    if (currentPassword || newPassword || confirmPassword) {
-        // 現在のパスワードが未入力
-        if (!currentPassword) {
-            e.preventDefault();
-            alert('現在のパスワードを入力してください');
-            return;
-        }
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
         
-        // 新しいパスワードが未入力
-        if (!newPassword) {
-            e.preventDefault();
-            alert('新しいパスワードを入力してください');
-            return;
+        if (newPassword && confirmPassword) {
+            if (newPassword.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('新しいパスワードと確認用パスワードが一致しません');
+                return false;
+            }
         }
-        
-        // パスワードの長さチェック
-        if (newPassword.length < 8) {
-            e.preventDefault();
-            alert('新しいパスワードは8文字以上で設定してください');
-            return;
-        }
-        
-        // パスワード確認が一致しない
-        if (newPassword !== confirmPassword) {
-            e.preventDefault();
-            alert('新しいパスワードと確認用パスワードが一致しません');
-            return;
-        }
-    }
+    });
 });
 </script>
 </body>

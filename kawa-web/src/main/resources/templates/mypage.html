@@ -175,6 +175,37 @@ body {
     margin: 2px 0;
 }
 
+.bio-section {
+    margin-top: 20px;
+    padding: 16px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #2e7d32;
+}
+
+.bio-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2e7d32;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.bio-text {
+    color: #495057;
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.bio-empty {
+    color: #adb5bd;
+    font-style: italic;
+    font-size: 14px;
+}
+
 .stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -600,6 +631,17 @@ body {
                 <p th:if="${user.email != null and !user.email.isEmpty()}" th:text="${user.email}">email@example.com</p>
                 <p th:text="'登録日: ' + ${#temporals.format(user.createdAt, 'yyyy年MM月dd日')}">登録日: 2024年01月01日</p>
             </div>
+        </div>
+
+        <!-- 自己紹介セクション -->
+        <div class="bio-section" th:if="${user.bio != null and !user.bio.isEmpty()}">
+            <div class="bio-label">自己紹介</div>
+            <div class="bio-text" th:text="${user.bio}">自己紹介文が表示されます</div>
+        </div>
+        
+        <div class="bio-section" th:if="${user.bio == null or user.bio.isEmpty()}">
+            <div class="bio-label">自己紹介</div>
+            <div class="bio-empty">まだ自己紹介が設定されていません</div>
         </div>
 
         <div class="stats">

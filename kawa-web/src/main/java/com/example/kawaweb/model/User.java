@@ -41,6 +41,10 @@ public class User {
     // アイコン更新日時
     private LocalDateTime iconUpdatedAt;
 
+    // 自己紹介文
+    @Column(length = 500)
+    private String bio;
+
     // 登録日時
     private LocalDateTime createdAt;
 
@@ -120,6 +124,14 @@ public class User {
         this.iconUpdatedAt = iconUpdatedAt;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -149,6 +161,7 @@ public class User {
                 ", userId='" + userId + '\'' +
                 ", email='" + email + '\'' +
                 ", iconPath='" + iconPath + '\'' +
+                ", bio='" + bio + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
     }
