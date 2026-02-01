@@ -163,6 +163,12 @@ button:hover {
     color: #6c757d;
 }
 
+.form-note {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 480px) {
     .container {
@@ -199,9 +205,9 @@ button:hover {
 
     <form th:action="@{/login}" method="post">
         <div class="form-group">
-            <label for="username">ユーザー名</label>
-            <input type="text" id="username" name="username" required
-                placeholder="ユーザー名を入力してください">
+            <label for="userId">ユーザーID</label>
+            <input type="text" id="userId" name="userId" required
+                placeholder="ユーザーIDを入力">
         </div>
 
         <div class="form-group">

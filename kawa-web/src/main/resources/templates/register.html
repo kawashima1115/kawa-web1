@@ -69,6 +69,14 @@ input[type="text"]::placeholder, input[type="password"]::placeholder, input[type
     color: #6c757d;
 }
 
+input.error {
+    border-color: #dc3545;
+}
+
+input.success {
+    border-color: #28a745;
+}
+
 button {
     width: 100%;
     padding: 15px;
@@ -86,6 +94,12 @@ button {
 button:hover {
     background-color: #1b5e20;
     transform: translateY(-1px);
+}
+
+button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .alert {
@@ -139,6 +153,14 @@ button:hover {
     margin-top: 4px;
 }
 
+.form-note.error {
+    color: #dc3545;
+}
+
+.form-note.success {
+    color: #28a745;
+}
+
 .required {
     color: #dc3545;
 }
@@ -189,18 +211,32 @@ button:hover {
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <form th:action="@{/register}" method="post">
+    <form th:action="@{/register}" method="post" id="registerForm">
         <div class="form-group">
             <label for="username">ユーザー名 <span class="required">*</span></label>
             <input type="text" id="username" name="username" required
-                placeholder="ユーザー名を入力してください">
-            <div class="form-note">3文字以上で入力してください</div>
+                placeholder="ユーザー名を入力してください"
+                minlength="6">
+            <div class="form-note">6文字以上で入力してください</div>
+        </div>
+
+        <div class="form-group">
+            <label for="userId">ユーザーID <span class="required">*</span></label>
+            <input type="text" id="userId" name="userId" required
+                placeholder="user_id123"
+                pattern="[a-zA-Z0-9_.]+"
+                minlength="3"
+                maxlength="20">
+            <div class="form-note" id="userIdNote">
+                3～20文字。アルファベット、数字、_、.のみ使用可能
+            </div>
         </div>
 
         <div class="form-group">
             <label for="password">パスワード <span class="required">*</span></label>
             <input type="password" id="password" name="password" required
-                placeholder="パスワードを入力してください">
+                placeholder="パスワードを入力してください"
+                minlength="8">
             <div class="form-note">8文字以上で入力してください</div>
         </div>
 
@@ -211,7 +247,7 @@ button:hover {
 <!--            <div class="form-note">任意入力です</div>-->
 <!--        </div>-->
 
-        <button type="submit">アカウントを作成</button>
+        <button type="submit" id="submitBtn">アカウントを作成</button>
     </form>
 
     <div class="links">
@@ -219,5 +255,79 @@ button:hover {
         <a href="/">トップページ</a>
     </div>
 </div>
+
+<script>
+// ユーザーIDのリアルタイムバリデーション
+const userIdInput = document.getElementById('userId');
+const userIdNote = document.getElementById('userIdNote');
+const submitBtn = document.getElementById('submitBtn');
+
+userIdInput.addEventListener('input', function() {
+    const value = this.value;
+    const pattern = /^[a-zA-Z0-9_.]+$/;
+    
+    // 空の場合
+    if (value === '') {
+        this.classList.remove('error', 'success');
+        userIdNote.classList.remove('error', 'success');
+        userIdNote.textContent = '3～20文字。アルファベット、数字、_、.のみ使用可能';
+        return;
+    }
+    
+    // 文字種チェック
+    if (!pattern.test(value)) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = '使用できない文字が含まれています';
+        return;
+    }
+    
+    // 長さチェック
+    if (value.length < 3) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = 'あと' + (3 - value.length) + '文字必要です';
+        return;
+    }
+    
+    if (value.length > 20) {
+        this.classList.add('error');
+        this.classList.remove('success');
+        userIdNote.classList.add('error');
+        userIdNote.classList.remove('success');
+        userIdNote.textContent = '20文字以内で入力してください';
+        return;
+    }
+    
+    // すべてOK
+    this.classList.remove('error');
+    this.classList.add('success');
+    userIdNote.classList.remove('error');
+    userIdNote.classList.add('success');
+    userIdNote.textContent = '✓ 使用可能な形式です';
+});
+
+// フォーム送信前のバリデーション
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const userId = document.getElementById('userId').value;
+    const pattern = /^[a-zA-Z0-9_.]+$/;
+    
+    if (!pattern.test(userId)) {
+        e.preventDefault();
+        alert('ユーザーIDはアルファベット、数字、_、.のみ使用できます');
+        return false;
+    }
+    
+    if (userId.length < 3 || userId.length > 20) {
+        e.preventDefault();
+        alert('ユーザーIDは3文字以上20文字以内で入力してください');
+        return false;
+    }
+});
+</script>
 </body>
 </html>

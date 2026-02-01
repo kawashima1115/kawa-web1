@@ -1,6 +1,7 @@
 package com.example.kawaweb.controller;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -21,6 +22,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
     
+    // ユーザーIDの正規表現パターン（アルファベット、数字、_、.のみ）
+    private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_.]+$");
+    
     // 新規登録画面表示
     @GetMapping("/register")
     public String registerForm(Model model) {
@@ -30,10 +34,47 @@ public class UserController {
     
     // 新規登録処理
     @PostMapping("/register")
-    public String registerUser(@RequestParam String username, 
+    public String registerUser(@RequestParam String username,
+                              @RequestParam String userId,
                               @RequestParam String password,
                               @RequestParam(required = false) String email,
                               RedirectAttributes redirectAttributes) {
+        
+        // ユーザー名のバリデーション
+        if (username == null || username.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名を入力してください");
+            return "redirect:/register";
+        }
+        
+        // ユーザー名の長さチェック（6文字以上に変更）
+        if (username.length() < 6) {
+            redirectAttributes.addFlashAttribute("error", "ユーザー名は6文字以上で入力してください");
+            return "redirect:/register";
+        }
+        
+        // ユーザーIDのバリデーション
+        if (userId == null || userId.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDを入力してください");
+            return "redirect:/register";
+        }
+        
+        // ユーザーIDの長さチェック
+        if (userId.length() < 3 || userId.length() > 20) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDは3文字以上20文字以内で入力してください");
+            return "redirect:/register";
+        }
+        
+        // ユーザーIDの文字種チェック
+        if (!USER_ID_PATTERN.matcher(userId).matches()) {
+            redirectAttributes.addFlashAttribute("error", "ユーザーIDはアルファベット、数字、_、.のみ使用できます");
+            return "redirect:/register";
+        }
+        
+        // ユーザーID重複チェック
+        if (userRepository.existsByUserId(userId)) {
+            redirectAttributes.addFlashAttribute("error", "そのユーザーIDは既に使用されています");
+            return "redirect:/register";
+        }
         
         // ユーザー名重複チェック
         if (userRepository.existsByUsername(username)) {
@@ -48,7 +89,7 @@ public class UserController {
         }
         
         // 新規ユーザー作成・保存
-        User user = new User(username, password, email);
+        User user = new User(username, userId, password, email);
         userRepository.save(user);
         
         redirectAttributes.addFlashAttribute("success", "登録が完了しました。ログインしてください。");
@@ -61,15 +102,15 @@ public class UserController {
         return "login"; // templates/login.html
     }
     
-    // ログイン処理
+    // ログイン処理（ユーザーIDとパスワードのみ）
     @PostMapping("/login")
-    public String loginUser(@RequestParam String username,
+    public String loginUser(@RequestParam String userId,
                            @RequestParam String password,
                            HttpSession session,
                            RedirectAttributes redirectAttributes) {
         
-        // ユーザー認証
-        Optional<User> userOpt = userRepository.findByUsername(username);
+        // ユーザーIDで認証
+        Optional<User> userOpt = userRepository.findByUserId(userId);
         
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -82,7 +123,7 @@ public class UserController {
             }
         }
         
-        redirectAttributes.addFlashAttribute("error", "ユーザー名またはパスワードが間違っています");
+        redirectAttributes.addFlashAttribute("error", "ユーザーIDまたはパスワードが間違っています");
         return "redirect:/login";
     }
     
